@@ -1,0 +1,27 @@
+language: java
+jdk: oraclejdk8
+branches:
+  except:
+    - /^b[0-9]/
+env:
+  - GRADLE_OPTS="-Dorg.gradle.daemon=false"
+before_install:
+  - chmod a+x gradlew
+  - ./gradlew clean
+install: "./gradlew setupCIWorkspace --continue"
+script: "./gradlew build --continue"
+after_success:
+  - ./gradlew githubRelease --continue
+  #- ./gradlew bintrayUpload --continue
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+notifications:
+  email: false
+  webhooks:
+    urls:
+      secure: "l0p54ziHmZszGmy0MyqvDAbj5d9+vbqkUDjvjQuENS+rJuRO+MD83txViIO6Y3eRO9D7PpR0MRdeDesTMFSvsRsYjF9uC7k95Hk/+3JMEyjJ2CN6TW+f3SrKktMJypA6mdqH6ylhMTVkAONoZ+01iB3lRmlLnnYcBuk0juF+zQ9FzUF/MZpl54tjPwlnn+clpB0B6llcJcP8MhYw7y2Wqr6tBXc7wnYyF9os7H7pLuQuBov17D4E6FX2ZDCa2tw3HDXaxHyvEElmP+nGdmo7xwdSLDrD1eyT/+3aoXLygV1SijfT/zEmCIvEGoUp8znRWhOhN2k4b4m8Khp908IoXFxtoVID/VLiJuRPW9vRkQuYB0pGaWeJXVY8PnUKPeidN+6hzBxw6Ky9J+yq2qrkfxX5cUTYnLsOFgXlev6LdgzIefLbsQ/xOelkf485w+jXNk7Flx1Tmnt0XWmWoHWWcAiDm9dMlES9GjWbb62AEUpI/mLCzLBZZVZwZd8/UUGAOpqcsi5uWrXCohOJN5rDXeje9PqUP0CIrrOkTE5JWZDPhSCpKgoU7t6z8sRrcUlDhUoAW2TVLKjyMpTMAwLKmsndr+UP4bGeX6q2hle4RxvFcubP8WCw3GjL2Eqb5w9X1eCiFva6U0zGBDhctJoG0bvwzdTbNL3/8t6dqk+T/d4="
