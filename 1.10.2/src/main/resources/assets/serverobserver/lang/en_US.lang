@@ -1,4 +1,4 @@
-serverobserver.gui.mode=Mode
+
 serverobserver.gui.mode.1=§eObserve and AutoLogin %s
 serverobserver.gui.mode.2=§aObserve %s
 serverobserver.gui.mode.3=§cDisabled

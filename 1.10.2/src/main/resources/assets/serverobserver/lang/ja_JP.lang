@@ -1,4 +1,4 @@
-serverobserver.gui.mode=切り替え
+
 serverobserver.gui.mode.1=§e監視&自動ログイン %s
 serverobserver.gui.mode.2=§a監視 %s
 serverobserver.gui.mode.3=§c無効
