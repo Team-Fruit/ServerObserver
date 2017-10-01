@@ -19,6 +19,7 @@ import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ServerListEntryNormal;
 import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.init.SoundEvents;
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
@@ -35,6 +36,30 @@ public class GuiHandler {
 	private GuiButton disableBackButton;
 	private @Nullable GuiButton mainMenuMultiPlayer;
 
+	public static class SkeletonButton extends GuiButton {
+		public SkeletonButton(final int buttonId, final int x, final int y, final int widthIn, final int heightIn, final String buttonText) {
+			super(buttonId, x, y, widthIn, heightIn, buttonText);
+		}
+
+		public SkeletonButton(final int buttonId, final int x, final int y, final String buttonText) {
+			super(buttonId, x, y, buttonText);
+		}
+
+		@Override
+		public void drawButton(final Minecraft mc, final int mouseX, final int mouseY) {
+			if (this.visible) {
+				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+				this.hovered = mouseX>=this.xPosition&&mouseY>=this.yPosition&&mouseX<this.xPosition+this.width&&mouseY<this.yPosition+this.height;
+				mouseDragged(mc, mouseX, mouseY);
+				drawRect(this.xPosition, this.yPosition, this.xPosition+this.width, this.yPosition+this.height, 0xcc000000);
+				drawInside(mc, mouseX, mouseY);
+			}
+		}
+
+		protected void drawInside(final Minecraft mc, final int mouseX, final int mouseY) {
+		}
+	}
+
 	@CoreEvent
 	public void open(final InitGuiEvent.Post e) {
 		Timer.tick();
@@ -43,22 +68,38 @@ public class GuiHandler {
 		this.mainMenuMultiPlayer = null;
 		if (screen instanceof GuiMultiplayer) {
 			final GuiMultiplayer mpgui = (GuiMultiplayer) screen;
-			e.getButtonList().add(new GuiButton(BUTTON_ID, 5, 5, 40, 20, I18n.format("serverobserver.gui.mode")));
+			e.getButtonList().add(new SkeletonButton(BUTTON_ID, mpgui.width-(5+180), 5, 180, 23, I18n.format("serverobserver.gui.mode")) {
+				@Override
+				protected void drawInside(final Minecraft mc, final int mouseX, final int mouseY) {
+					final ServerData serverData = GuiHandler.this.target.get(mpgui);
+					final FontRenderer font = mc.fontRendererObj;
+					GuiHandler.this.displayText = serverData!=null ? GuiHandler.this.autologin ? "serverobserver.gui.mode.1" : "serverobserver.gui.mode.2" : "serverobserver.gui.mode.3";
+					mpgui.drawString(font, I18n.format(GuiHandler.this.displayText, GuiHandler.this.displayTime), this.xPosition+4, this.yPosition+3, Color.WHITE.getRGB());
+					if (serverData!=null) {
+						final String text = font.trimStringToWidth(serverData.serverName, this.width-(4*2+font.getStringWidth("...")));
+						mpgui.drawString(font, text, this.xPosition+4, this.yPosition+12, Color.GRAY.getRGB());
+						if (!StringUtils.equals(serverData.serverName, text))
+							mpgui.drawString(font, "...", this.xPosition+4+font.getStringWidth(text), this.yPosition+12, Color.GRAY.getRGB());
+					}
+				}
+			});
 			selectTarget(mpgui, this.target.getIP());
 			reset(Config.getConfig().durationPing);
 		} else if (screen instanceof GuiDisconnected) {
 			final GuiDisconnected dcgui = (GuiDisconnected) screen;
 			final FontRenderer font = dcgui.mc.fontRendererObj;
-			e.getButtonList().add(this.disableBackButton = new GuiButton(DISABLE_BACK_BUTTON_ID, dcgui.width/2-100, dcgui.height/2+dcgui.textHeight/2+font.FONT_HEIGHT+25, I18n.format("serverobserver.gui.backandstop", 0f)));
+			e.getButtonList().add(
+					this.disableBackButton = new GuiButton(DISABLE_BACK_BUTTON_ID,
+							dcgui.width/2-100, dcgui.height/2+dcgui.textHeight/2+font.FONT_HEIGHT+25,
+							I18n.format("serverobserver.gui.backandstop", 0f)));
 			reset(Config.getConfig().durationDisconnected);
 		} else if (screen instanceof GuiMainMenu) {
 			for (final GuiButton button : e.getButtonList())
 				if (button.id==2)
 					this.mainMenuMultiPlayer = button;
-			if (Config.getConfig().durationMainMenu.get()>0) {
+			if (Config.getConfig().durationMainMenu.get()>0)
 				reset(Config.getConfig().durationMainMenu);
-				Log.log.info("ready");
-			}
+			// Log.log.info("ready");
 		}
 	}
 
@@ -66,14 +107,6 @@ public class GuiHandler {
 	public void draw(final DrawScreenEvent.Post e) {
 		final GuiScreen gui = e.getGui();
 		if (gui instanceof GuiMultiplayer) {
-			final GuiMultiplayer mpgui = (GuiMultiplayer) gui;
-			final ServerData serverData = this.target.get(mpgui);
-			this.displayText = serverData!=null ? this.autologin ? "serverobserver.gui.mode.1" : "serverobserver.gui.mode.2" : "serverobserver.gui.mode.3";
-
-			final FontRenderer font = gui.mc.fontRendererObj;
-			gui.drawString(font, I18n.format(this.displayText, this.displayTime), 50, 7, Color.WHITE.getRGB());
-			if (serverData!=null)
-				gui.drawString(font, serverData.serverName, 50, 16, Color.GRAY.getRGB());
 		} else if (gui instanceof GuiDisconnected) {
 			if (this.disableBackButton!=null)
 				this.disableBackButton.displayString = I18n.format("serverobserver.gui.backandstop", timeremain());
@@ -168,7 +201,7 @@ public class GuiHandler {
 			if (serverData!=null) {
 				final Boolean before = this.targetServerStatus;
 				this.targetServerStatus = serverData.pinged&&serverData.pingToServer>=0;
-				Log.log.info("pinged: {}, pingms: {}", serverData.pinged, serverData.pingToServer);
+				// Log.log.info("pinged: {}, pingms: {}", serverData.pinged, serverData.pingToServer);
 				if (this.targetServerStatus)
 					if (before!=null&&!before)
 						this.mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ENTITY_EXPERIENCE_ORB_TOUCH, 1.0F));
@@ -205,7 +238,7 @@ public class GuiHandler {
 		final String minstr = time.getProperty().getMinValue();
 		if (minstr!=null)
 			duration = Math.max(duration, NumberUtils.toInt(minstr));
-		Log.log.info("{}: {}", time.property.getName(), duration);
+		// Log.log.info("{}: {}", time.property.getName(), duration);
 		this.timer.set(-duration);
 	}
 
