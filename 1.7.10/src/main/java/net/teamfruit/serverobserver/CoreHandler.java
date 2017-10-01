@@ -1,18 +1,15 @@
 package net.teamfruit.serverobserver;
 
-import java.util.Collections;
-import java.util.Set;
-import java.util.WeakHashMap;
-
 import javax.annotation.Nonnull;
 
+import cpw.mods.fml.client.event.ConfigChangedEvent;
+import cpw.mods.fml.common.FMLCommonHandler;
+import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import cpw.mods.fml.common.gameevent.TickEvent.ClientTickEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.client.event.ConfigChangedEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 
 public class CoreHandler {
 	public static final @Nonnull CoreHandler instance = new CoreHandler();
@@ -23,14 +20,13 @@ public class CoreHandler {
 	public void init() {
 		// FMLCommonHandler.instance().bus().register(this);
 		MinecraftForge.EVENT_BUS.register(this);
+		FMLCommonHandler.instance().bus().register(this);
 	}
-
-	public Set<ConfigBase> configChangeHandlers = Collections.newSetFromMap(new WeakHashMap<ConfigBase, Boolean>());
 
 	@SubscribeEvent
 	public void onConfigChanged(final @Nonnull ConfigChangedEvent.OnConfigChangedEvent eventArgs) {
-		for (final ConfigBase base : this.configChangeHandlers)
-			base.onConfigChanged(eventArgs.getModID());
+		for (final ConfigBase base : ConfigBase.configChangeHandlers)
+			base.onConfigChanged(eventArgs.modID);
 	}
 
 	@SubscribeEvent

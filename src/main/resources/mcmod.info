@@ -17,8 +17,8 @@
 			"requiredMods": ["Forge"],
 			"logoFile": "assets/serverobserver/textures/banner.png",
 			"screenshots": [],
-			"updateUrl": "https://github.com/Team-Fruit/FruitLib/releases",
-			"url": "https://github.com/Team-Fruit/FruitLib/releases",
+			"updateUrl": "https://github.com/Team-Fruit/ServerObserver/releases",
+			"url": "https://github.com/Team-Fruit/ServerObserver/releases",
 			"useDependencyInformation": false
 		}
 	]

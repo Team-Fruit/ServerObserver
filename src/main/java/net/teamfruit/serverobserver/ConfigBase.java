@@ -14,7 +14,6 @@ import com.google.common.collect.Sets;
 
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
-import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 
 public class ConfigBase extends Configuration {
 	private final @Nonnull Set<IReloadableConfig> configs = Sets.newHashSet();
@@ -33,6 +32,8 @@ public class ConfigBase extends Configuration {
 			config.reload();
 	}
 
+	public static Set<ConfigBase> configChangeHandlers = Collections.newSetFromMap(new WeakHashMap<ConfigBase, Boolean>());
+
 	public ConfigBase(final @Nonnull File configFile, final @Nonnull String version) {
 		super(configFile, version, true);
 		configChangeHandlers.add(this);
@@ -44,19 +45,11 @@ public class ConfigBase extends Configuration {
 			super.save();
 	}
 
-	public void onConfigChanged(final @Nonnull ConfigChangedEvent.OnConfigChangedEvent eventArgs) {
-		if (StringUtils.equals(eventArgs.getModID(), Reference.MODID)) {
+	public void onConfigChanged(final @Nonnull String modid) {
+		if (StringUtils.equals(modid, Reference.MODID)) {
 			save();
 			reload();
 		}
-	}
-
-	public static Set<ConfigBase> configChangeHandlers = Collections.newSetFromMap(new WeakHashMap<ConfigBase, Boolean>());
-
-	@CoreEvent
-	public static void onConfigChangedAll(final @Nonnull ConfigChangedEvent.OnConfigChangedEvent eventArgs) {
-		for (final ConfigBase base : configChangeHandlers)
-			base.onConfigChanged(eventArgs);
 	}
 
 	public @Nonnull ConfigProperty<String> propertyString(final @Nonnull Property property) {
