@@ -6,10 +6,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiDisconnected;
+import net.minecraft.client.gui.GuiListExtended.IGuiListEntry;
 import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ServerListEntryNormal;
-import net.minecraft.client.gui.GuiListExtended.IGuiListEntry;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
@@ -50,5 +50,9 @@ public interface ICompat {
 	IGuiListEntry getListEntry(GuiMultiplayer mpgui, int index);
 
 	ServerData getServerData(ServerListEntryNormal entry);
+
+	int getPositionX(GuiButton button);
+
+	int getPositionY(GuiButton button);
 
 }

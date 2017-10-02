@@ -107,4 +107,14 @@ public class Compat implements ICompat {
 	public ServerData getServerData(final ServerListEntryNormal entry) {
 		return entry.getServerData();
 	}
+
+	@Override
+	public int getPositionX(final GuiButton button) {
+		return button.xPosition;
+	}
+
+	@Override
+	public int getPositionY(final GuiButton button) {
+		return button.yPosition;
+	}
 }

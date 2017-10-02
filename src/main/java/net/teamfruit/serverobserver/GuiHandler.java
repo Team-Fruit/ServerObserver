@@ -40,7 +40,13 @@ public class GuiHandler {
 		this.compat = compat;
 	}
 
-	public class SkeletonButton extends GuiButton {
+	public interface DrawButton {
+		public void drawButton(final Minecraft mc, final int mouseX, final int mouseY);
+
+		public void drawButton(final Minecraft mc, final int mouseX, final int mouseY, float partialTicks);
+	}
+
+	public class SkeletonButton extends GuiButton implements DrawButton {
 		public SkeletonButton(final int buttonId, final int x, final int y, final int widthIn, final int heightIn, final String buttonText) {
 			super(buttonId, x, y, widthIn, heightIn, buttonText);
 		}
@@ -55,14 +61,21 @@ public class GuiHandler {
 		public void drawButton(final Minecraft mc, final int mouseX, final int mouseY) {
 			if (this.visible) {
 				GuiHandler.this.compat.color(1.0F, 1.0F, 1.0F, 1.0F);
-				this.isHovered = mouseX>=this.xPosition&&mouseY>=this.yPosition&&mouseX<this.xPosition+this.width&&mouseY<this.yPosition+this.height;
+				final int x = GuiHandler.this.compat.getPositionX(this);
+				final int y = GuiHandler.this.compat.getPositionY(this);
+				this.isHovered = mouseX>=x&&mouseY>=y&&mouseX<x+this.width&&mouseY<y+this.height;
 				mouseDragged(mc, mouseX, mouseY);
-				drawRect(this.xPosition, this.yPosition, this.xPosition+this.width, this.yPosition+this.height, 0xcc000000);
-				drawInside(mc, mouseX, mouseY);
+				drawRect(x, y, x+this.width, y+this.height, 0xcc000000);
+				drawInside(mc, mouseX, mouseY, x, y);
 			}
 		}
 
-		protected void drawInside(final Minecraft mc, final int mouseX, final int mouseY) {
+		@Override
+		public void drawButton(final Minecraft mc, final int mouseX, final int mouseY, final float partialTicks) {
+			drawButton(mc, mouseX, mouseY);
+		}
+
+		protected void drawInside(final Minecraft mc, final int mouseX, final int mouseY, final int x, final int y) {
 		}
 	}
 
@@ -77,16 +90,16 @@ public class GuiHandler {
 			final GuiMultiplayer mpgui = (GuiMultiplayer) screen;
 			buttons.add(new SkeletonButton(BUTTON_ID, mpgui.width-(5+180), 5, 180, 23, I18n.format("serverobserver.gui.mode")) {
 				@Override
-				protected void drawInside(final Minecraft mc, final int mouseX, final int mouseY) {
+				protected void drawInside(final Minecraft mc, final int mouseX, final int mouseY, final int x, final int y) {
 					final ServerData serverData = GuiHandler.this.target.get(mpgui);
 					final FontRenderer font = GuiHandler.this.compat.font(mc);
 					GuiHandler.this.displayText = serverData!=null ? GuiHandler.this.autologin.is() ? "serverobserver.gui.mode.1" : "serverobserver.gui.mode.2" : "serverobserver.gui.mode.3";
-					mpgui.drawString(font, I18n.format(GuiHandler.this.displayText, GuiHandler.this.displayTime), this.xPosition+4, this.yPosition+3, Color.WHITE.getRGB());
+					mpgui.drawString(font, I18n.format(GuiHandler.this.displayText, GuiHandler.this.displayTime), x+4, y+3, Color.WHITE.getRGB());
 					if (serverData!=null) {
 						final String text = font.trimStringToWidth(serverData.serverName, this.width-(4*2+font.getStringWidth("...")));
-						mpgui.drawString(font, text, this.xPosition+4, this.yPosition+12, Color.GRAY.getRGB());
+						mpgui.drawString(font, text, x+4, y+12, Color.GRAY.getRGB());
 						if (!StringUtils.equals(serverData.serverName, text))
-							mpgui.drawString(font, "...", this.xPosition+4+font.getStringWidth(text), this.yPosition+12, Color.GRAY.getRGB());
+							mpgui.drawString(font, "...", x+4+font.getStringWidth(text), y+12, Color.GRAY.getRGB());
 					}
 				}
 			});
