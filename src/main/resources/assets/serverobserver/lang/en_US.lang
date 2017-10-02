@@ -1,5 +1,5 @@
 
-serverobserver.gui.mode.1=§eObserve and AutoLogin %s
+serverobserver.gui.mode.1=§eAutoLogin %s
 serverobserver.gui.mode.2=§aObserve %s
 serverobserver.gui.mode.3=§cDisabled
 serverobserver.gui.nextping= §7Next Ping: %s

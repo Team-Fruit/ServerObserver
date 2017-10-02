@@ -16,8 +16,8 @@ public class Config extends ConfigBase {
 	}
 
 	public static void init(final @Nonnull File cfgFile, final @Nonnull String version, @Nonnull final ICompat icompat) {
-		instance = new Config(cfgFile, version);
 		compat = icompat;
+		instance = new Config(cfgFile, version);
 	}
 
 	private Config(final @Nonnull File configFile, final @Nonnull String version) {

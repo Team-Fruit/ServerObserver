@@ -25,24 +25,23 @@ public class Compat implements ICompat {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public List<GuiButton> getButtonList(final InitGuiEvent e) {
 		return e.buttonList;
 	}
 
 	@Override
 	public FontRenderer font(final Minecraft mc) {
-		return mc.fontRenderer;
+		return mc.fontRendererObj;
 	}
 
 	@Override
 	public int getHeight(final GuiDisconnected dcgui) {
-		return dcgui.height/4+120+12+25;
+		return dcgui.height/2+dcgui.field_175353_i/2+font(dcgui.mc).FONT_HEIGHT+25;
 	}
 
 	@Override
 	public GuiScreen getParentScreen(final GuiDisconnected dcgui) {
-		return dcgui.field_146307_h;
+		return dcgui.parentScreen;
 	}
 
 	@Override
@@ -52,12 +51,12 @@ public class Compat implements ICompat {
 
 	@Override
 	public int getSelected(final GuiMultiplayer mpgui) {
-		return mpgui.field_146803_h.func_148193_k();
+		return mpgui.serverListSelector.func_148193_k();
 	}
 
 	@Override
 	public void connectToServer(final GuiMultiplayer mpgui, final ServerData serverData) {
-		mpgui.func_146791_a(serverData);
+		mpgui.connectToServer(serverData);
 	}
 
 	@Override
@@ -79,32 +78,32 @@ public class Compat implements ICompat {
 
 	@Override
 	public void playSound(final Minecraft mc, final ResourceLocation sound, final float pitch) {
-		mc.getSoundHandler().playSound(PositionedSoundRecord.func_147674_a(sound, pitch));
+		mc.getSoundHandler().playSound(new PositionedSoundRecord(sound, 0.25F, pitch, 0.0F, 0.0F, 0.0F));
 	}
 
 	@Override
 	public void selectServer(final GuiMultiplayer mpgui, final int index) {
-		mpgui.func_146790_a(index);
+		mpgui.selectServer(index);
 	}
 
 	@Override
 	public int countServers(final GuiMultiplayer mpgui) {
-		return mpgui.func_146795_p().countServers();
+		return mpgui.getServerList().countServers();
 	}
 
 	@Override
 	public ServerData getServerData(final GuiMultiplayer mpgui, final int index) {
-		return mpgui.func_146795_p().getServerData(index);
+		return mpgui.getServerList().getServerData(index);
 	}
 
 	@Override
 	public IGuiListEntry getListEntry(final GuiMultiplayer mpgui, final int index) {
-		return mpgui.field_146803_h.getListEntry(index);
+		return mpgui.serverListSelector.getListEntry(index);
 	}
 
 	@Override
 	public ServerData getServerData(final ServerListEntryNormal entry) {
-		return entry.func_148296_a();
+		return entry.getServerData();
 	}
 
 	@Override

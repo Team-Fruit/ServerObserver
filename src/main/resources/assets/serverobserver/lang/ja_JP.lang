@@ -1,5 +1,5 @@
 
-serverobserver.gui.mode.1=§e監視&自動ログイン %s
+serverobserver.gui.mode.1=§e自動ログイン %s
 serverobserver.gui.mode.2=§a監視 %s
 serverobserver.gui.mode.3=§c無効
 serverobserver.gui.nextping= §7次のPingまで: %s秒

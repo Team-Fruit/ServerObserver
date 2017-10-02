@@ -5,6 +5,7 @@ import java.util.List;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
@@ -14,7 +15,9 @@ import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ServerListEntryNormal;
 import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
 
@@ -25,9 +28,8 @@ public class Compat implements ICompat {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public List<GuiButton> getButtonList(final InitGuiEvent e) {
-		return e.buttonList;
+		return e.getButtonList();
 	}
 
 	@Override
@@ -37,83 +39,81 @@ public class Compat implements ICompat {
 
 	@Override
 	public int getHeight(final GuiDisconnected dcgui) {
-		return dcgui.height/4+120+12+25;
+		return dcgui.height/2+dcgui.textHeight/2+font(dcgui.mc).FONT_HEIGHT+25;
 	}
 
 	@Override
 	public GuiScreen getParentScreen(final GuiDisconnected dcgui) {
-		return dcgui.field_146307_h;
+		return dcgui.parentScreen;
 	}
 
 	@Override
 	public GuiButton getButton(final ActionPerformedEvent e) {
-		return e.button;
+		return e.getButton();
 	}
 
 	@Override
 	public int getSelected(final GuiMultiplayer mpgui) {
-		return mpgui.field_146803_h.func_148193_k();
+		return mpgui.serverListSelector.getSelected();
 	}
 
 	@Override
 	public void connectToServer(final GuiMultiplayer mpgui, final ServerData serverData) {
-		mpgui.func_146791_a(serverData);
+		mpgui.connectToServer(serverData);
 	}
 
 	@Override
 	public boolean getPinged(final ServerData serverData) {
-		return serverData.field_78841_f;
+		return serverData.pinged;
 	}
 
 	@Override
 	public void setPinged(final ServerData serverData, final boolean pinged) {
-		serverData.field_78841_f = pinged;
+		serverData.pinged = pinged;
 	}
-
-	private final String defaultSound = "minecraft:random.orb";
 
 	@Override
 	public String getDefaultSound() {
-		return this.defaultSound;
+		return SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP.getSoundName().toString();
 	}
 
 	@Override
 	public void playSound(final Minecraft mc, final ResourceLocation sound, final float pitch) {
-		mc.getSoundHandler().playSound(PositionedSoundRecord.func_147674_a(sound, pitch));
+		mc.getSoundHandler().playSound(new PositionedSoundRecord(sound, SoundCategory.MASTER, 0.25F, pitch, false, 0, ISound.AttenuationType.NONE, 0.0F, 0.0F, 0.0F));
 	}
 
 	@Override
 	public void selectServer(final GuiMultiplayer mpgui, final int index) {
-		mpgui.func_146790_a(index);
+		mpgui.selectServer(index);
 	}
 
 	@Override
 	public int countServers(final GuiMultiplayer mpgui) {
-		return mpgui.func_146795_p().countServers();
+		return mpgui.getServerList().countServers();
 	}
 
 	@Override
 	public ServerData getServerData(final GuiMultiplayer mpgui, final int index) {
-		return mpgui.func_146795_p().getServerData(index);
+		return mpgui.getServerList().getServerData(index);
 	}
 
 	@Override
 	public IGuiListEntry getListEntry(final GuiMultiplayer mpgui, final int index) {
-		return mpgui.field_146803_h.getListEntry(index);
+		return mpgui.serverListSelector.getListEntry(index);
 	}
 
 	@Override
 	public ServerData getServerData(final ServerListEntryNormal entry) {
-		return entry.func_148296_a();
+		return entry.getServerData();
 	}
 
 	@Override
 	public int getPositionX(final GuiButton button) {
-		return button.xPosition;
+		return button.x;
 	}
 
 	@Override
 	public int getPositionY(final GuiButton button) {
-		return button.yPosition;
+		return button.y;
 	}
 }
