@@ -20,6 +20,8 @@ public class ServerObserver {
 	@Instance(Reference.MODID)
 	public static @Nullable ServerObserver instance;
 
+	public static final @Nonnull ICompat compat = new Compat();
+
 	@SidedProxy(serverSide = Reference.PROXY_SERVER, clientSide = Reference.PROXY_CLIENT)
 	public static @Nullable CommonProxy proxy;
 

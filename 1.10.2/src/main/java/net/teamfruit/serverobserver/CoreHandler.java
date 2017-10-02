@@ -14,7 +14,7 @@ public class CoreHandler {
 	public static final @Nonnull CoreHandler instance = new CoreHandler();
 
 	public final @Nonnull Config configHandler = Config.getConfig();
-	public final @Nonnull GuiHandler guiHandler = new GuiHandler();
+	public final @Nonnull GuiHandler guiHandler = new GuiHandler(ServerObserver.compat);
 
 	public void init() {
 		// FMLCommonHandler.instance().bus().register(this);

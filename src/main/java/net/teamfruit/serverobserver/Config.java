@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 
 public class Config extends ConfigBase {
 	private static @Nullable Config instance;
+	private static @Nullable ICompat compat;
 
 	public static @Nonnull Config getConfig() {
 		if (instance!=null)
@@ -14,8 +15,9 @@ public class Config extends ConfigBase {
 		throw new IllegalStateException("config not initialized");
 	}
 
-	public static void init(final @Nonnull File cfgFile, final @Nonnull String version) {
+	public static void init(final @Nonnull File cfgFile, final @Nonnull String version, @Nonnull final ICompat icompat) {
 		instance = new Config(cfgFile, version);
+		compat = icompat;
 	}
 
 	private Config(final @Nonnull File configFile, final @Nonnull String version) {
@@ -42,6 +44,6 @@ public class Config extends ConfigBase {
 		getCategory("Notification").setLanguageKey("serverobserver.config.notification").setComment("Notify by sound");
 	}
 
-	public final ConfigProperty<String> notificationSound = propertyString(get("Notification", "Sound", Compat.defaultSound, "Sound resource location").setLanguageKey("serverobserver.config.notification.sound"));
+	public final ConfigProperty<String> notificationSound = propertyString(get("Notification", "Sound", compat!=null ? compat.getDefaultSound() : "", "Sound resource location").setLanguageKey("serverobserver.config.notification.sound"));
 	public final ConfigProperty<Double> notificationPitch = propertyDouble(get("Notification", "Pitch", 1.0, "Sound pitch (minimum: 0.0, maximum: 2.0)").setMinValue(0.0).setMaxValue(2.0).setLanguageKey("serverobserver.config.notification.pitch"));
 }

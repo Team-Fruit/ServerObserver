@@ -20,70 +20,91 @@ import net.minecraft.util.SoundCategory;
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
 
-public class Compat {
-	public static void color(final float colorRed, final float colorGreen, final float colorBlue, final float colorAlpha) {
+public class Compat implements ICompat {
+	@Override
+	public void color(final float colorRed, final float colorGreen, final float colorBlue, final float colorAlpha) {
 		GL11.glColor4f(colorRed, colorGreen, colorBlue, colorAlpha);
 	}
 
-	public static List<GuiButton> getButtonList(final InitGuiEvent e) {
+	@Override
+	public List<GuiButton> getButtonList(final InitGuiEvent e) {
 		return e.getButtonList();
 	}
 
-	public static FontRenderer font(final Minecraft mc) {
+	@Override
+	public FontRenderer font(final Minecraft mc) {
 		return mc.fontRendererObj;
 	}
 
-	public static int getHeight(final GuiDisconnected dcgui) {
+	@Override
+	public int getHeight(final GuiDisconnected dcgui) {
 		return dcgui.height/2+dcgui.textHeight/2+font(dcgui.mc).FONT_HEIGHT+25;
 	}
 
-	public static GuiScreen getParentScreen(final GuiDisconnected dcgui) {
+	@Override
+	public GuiScreen getParentScreen(final GuiDisconnected dcgui) {
 		return dcgui.parentScreen;
 	}
 
-	public static GuiButton getButton(final ActionPerformedEvent e) {
+	@Override
+	public GuiButton getButton(final ActionPerformedEvent e) {
 		return e.getButton();
 	}
 
-	public static int getSelected(final GuiMultiplayer mpgui) {
+	@Override
+	public int getSelected(final GuiMultiplayer mpgui) {
 		return mpgui.serverListSelector.getSelected();
 	}
 
-	public static void connectToServer(final GuiMultiplayer mpgui, final ServerData serverData) {
+	@Override
+	public void connectToServer(final GuiMultiplayer mpgui, final ServerData serverData) {
 		mpgui.connectToServer(serverData);
 	}
 
-	public static boolean getPinged(final ServerData serverData) {
+	@Override
+	public boolean getPinged(final ServerData serverData) {
 		return serverData.pinged;
 	}
 
-	public static void setPinged(final ServerData serverData, final boolean pinged) {
+	@Override
+	public void setPinged(final ServerData serverData, final boolean pinged) {
 		serverData.pinged = pinged;
 	}
 
-	public static String defaultSound = "minecraft:entity.experience_orb.touch";
+	private final String defaultSound = "minecraft:entity.experience_orb.touch";
 
-	public static void playSound(final Minecraft mc, final ResourceLocation sound, final float pitch) {
+	@Override
+	public String getDefaultSound() {
+		return this.defaultSound;
+	}
+
+	@Override
+	public void playSound(final Minecraft mc, final ResourceLocation sound, final float pitch) {
 		mc.getSoundHandler().playSound(new PositionedSoundRecord(sound, SoundCategory.MASTER, 0.25F, pitch, false, 0, ISound.AttenuationType.NONE, 0.0F, 0.0F, 0.0F));
 	}
 
-	public static void selectServer(final GuiMultiplayer mpgui, final int index) {
+	@Override
+	public void selectServer(final GuiMultiplayer mpgui, final int index) {
 		mpgui.selectServer(index);
 	}
 
-	public static int countServers(final GuiMultiplayer mpgui) {
+	@Override
+	public int countServers(final GuiMultiplayer mpgui) {
 		return mpgui.getServerList().countServers();
 	}
 
-	public static ServerData getServerData(final GuiMultiplayer mpgui, final int index) {
+	@Override
+	public ServerData getServerData(final GuiMultiplayer mpgui, final int index) {
 		return mpgui.getServerList().getServerData(index);
 	}
 
-	public static IGuiListEntry getListEntry(final GuiMultiplayer mpgui, final int index) {
+	@Override
+	public IGuiListEntry getListEntry(final GuiMultiplayer mpgui, final int index) {
 		return mpgui.serverListSelector.getListEntry(index);
 	}
 
-	public static ServerData getServerData(final ServerListEntryNormal entry) {
+	@Override
+	public ServerData getServerData(final ServerListEntryNormal entry) {
 		return entry.getServerData();
 	}
 }
