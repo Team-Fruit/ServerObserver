@@ -1,18 +1,19 @@
 package net.teamfruit.serverobserver;
 
-import javax.annotation.Nonnull;
-
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
-public class CommonProxy {
-	public void preInit(final @Nonnull FMLPreInitializationEvent event) {
+public class CommonProxy implements IProxy {
+	@Override
+	public void preInit(final FMLPreInitializationEvent event) {
 	}
 
-	public void init(final @Nonnull FMLInitializationEvent event) {
+	@Override
+	public void init(final FMLInitializationEvent event) {
 	}
 
-	public void postInit(final @Nonnull FMLPostInitializationEvent event) {
+	@Override
+	public void postInit(final FMLPostInitializationEvent event) {
 	}
 }

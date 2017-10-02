@@ -23,7 +23,7 @@ public class ServerObserver {
 	public static final @Nonnull ICompat compat = new Compat();
 
 	@SidedProxy(serverSide = Reference.PROXY_SERVER, clientSide = Reference.PROXY_CLIENT)
-	public static @Nullable CommonProxy proxy;
+	public static @Nullable IProxy proxy;
 
 	@NetworkCheckHandler
 	public boolean checkModList(final @Nonnull Map<String, String> versions, final @Nonnull Side side) {
