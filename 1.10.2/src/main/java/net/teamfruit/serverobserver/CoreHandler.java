@@ -1,9 +1,5 @@
 package net.teamfruit.serverobserver;
 
-import java.util.Collections;
-import java.util.Set;
-import java.util.WeakHashMap;
-
 import javax.annotation.Nonnull;
 
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
@@ -25,11 +21,9 @@ public class CoreHandler {
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 
-	public Set<ConfigBase> configChangeHandlers = Collections.newSetFromMap(new WeakHashMap<ConfigBase, Boolean>());
-
 	@SubscribeEvent
 	public void onConfigChanged(final @Nonnull ConfigChangedEvent.OnConfigChangedEvent eventArgs) {
-		for (final ConfigBase base : this.configChangeHandlers)
+		for (final ConfigBase base : ConfigBase.configChangeHandlers)
 			base.onConfigChanged(eventArgs.getModID());
 	}
 

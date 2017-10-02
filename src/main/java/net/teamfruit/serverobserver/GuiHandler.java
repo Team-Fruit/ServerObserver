@@ -20,6 +20,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ServerListEntryNormal;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
@@ -107,11 +108,11 @@ public class GuiHandler {
 		final GuiScreen gui = this.mc.currentScreen;
 		if (gui instanceof GuiMultiplayer) {
 		} else if (gui instanceof GuiDisconnected) {
-			if (this.disableBackButton!=null)
-				this.disableBackButton.displayString = I18n.format("serverobserver.gui.backandstop", timeremain());
+			if (this.disableBackButton!=null&&Config.getConfig().durationDisconnected.get()>=10)
+				this.disableBackButton.displayString = I18n.format("serverobserver.gui.backandstop.time", I18n.format("serverobserver.gui.backandstop"), timeremain());
 		} else if (gui instanceof GuiMainMenu)
 			if (this.mainMenuMultiPlayer!=null&&this.target.getIP()!=null&&!this.hasOpened)
-				this.mainMenuMultiPlayer.displayString = I18n.format("serverobserver.gui.maintomulti", I18n.format("menu.multiplayer"), timeremain());
+				this.mainMenuMultiPlayer.displayString = I18n.format("serverobserver.gui.maintomulti.time", I18n.format("menu.multiplayer"), timeremain());
 	}
 
 	private String displayText = "Disabled";
@@ -216,7 +217,7 @@ public class GuiHandler {
 				// Log.log.info("pinged: {}, pingms: {}", serverData.pinged, serverData.pingToServer);
 				if (this.targetServerStatus)
 					if (before!=null&&!before) {
-						Compat.playExpSound(this.mc);
+						Compat.playSound(this.mc, new ResourceLocation(Config.getConfig().notificationSound.get()), (float) (double) Config.getConfig().notificationPitch.get());
 						reset(Config.getConfig().durationAutoLogin);
 					}
 
@@ -241,10 +242,11 @@ public class GuiHandler {
 				dcgui.mc.displayGuiScreen(Compat.getParentScreen(dcgui));
 		} else if (this.mc.currentScreen instanceof GuiMainMenu) {
 			final GuiMainMenu mmgui = (GuiMainMenu) this.mc.currentScreen;
-			if (this.target.getIP()!=null&&!this.hasOpened)
+			if (this.target.getIP()!=null&&!this.hasOpened&&Config.getConfig().durationDisconnected.get()>=10)
 				if (this.timer.getTime()>0)
 					this.mc.displayGuiScreen(new GuiMultiplayer(mmgui));
-		}
+		} else
+			this.hasOpened = true;
 	}
 
 	private void reset(final ConfigProperty<Integer> time) {

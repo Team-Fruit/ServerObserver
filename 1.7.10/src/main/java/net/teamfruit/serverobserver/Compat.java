@@ -60,8 +60,10 @@ public class Compat {
 		serverData.field_78841_f = pinged;
 	}
 
-	public static void playExpSound(final Minecraft mc) {
-		mc.getSoundHandler().playSound(PositionedSoundRecord.func_147674_a(new ResourceLocation("minecraft", "random.orb"), 1.0F));
+	public static String defaultSound = "minecraft:random.orb";
+
+	public static void playSound(final Minecraft mc, final ResourceLocation sound, final float pitch) {
+		mc.getSoundHandler().playSound(PositionedSoundRecord.func_147674_a(sound, pitch));
 	}
 
 	public static void selectServer(final GuiMultiplayer mpgui, final int index) {

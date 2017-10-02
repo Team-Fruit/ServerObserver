@@ -5,6 +5,7 @@ import java.util.List;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
@@ -14,7 +15,8 @@ import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ServerListEntryNormal;
 import net.minecraft.client.multiplayer.ServerData;
-import net.minecraft.init.SoundEvents;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
 
@@ -59,8 +61,10 @@ public class Compat {
 		serverData.pinged = pinged;
 	}
 
-	public static void playExpSound(final Minecraft mc) {
-		mc.getSoundHandler().playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.ENTITY_EXPERIENCE_ORB_TOUCH, 1.0F));
+	public static String defaultSound = "minecraft:entity.experience_orb.touch";
+
+	public static void playSound(final Minecraft mc, final ResourceLocation sound, final float pitch) {
+		mc.getSoundHandler().playSound(new PositionedSoundRecord(sound, SoundCategory.MASTER, 0.25F, pitch, false, 0, ISound.AttenuationType.NONE, 0.0F, 0.0F, 0.0F));
 	}
 
 	public static void selectServer(final GuiMultiplayer mpgui, final int index) {
