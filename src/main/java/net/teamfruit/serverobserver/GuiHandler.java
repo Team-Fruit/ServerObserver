@@ -50,7 +50,7 @@ public class GuiHandler {
 		this.targetServerStatus = null;
 		final GuiScreen screen = this.mc.currentScreen;
 		final List<GuiButton> buttons = this.compat.getButtonList(e);
-		Log.log.info(String.format("opened: %s, buttons: %s", screen, buttons));
+		// Log.log.info(String.format("opened: %s, buttons: %s", screen, buttons));
 		if (screen instanceof GuiMultiplayer) {
 			final GuiMultiplayer mpgui = (GuiMultiplayer) screen;
 			buttons.add(this.compat.createSkeletonButton(BUTTON_ID, mpgui.width-(5+180), 5, 180, 23, I18n.format("serverobserver.gui.mode"),

@@ -28,10 +28,10 @@ public class Config extends ConfigBase {
 		getCategory("Duration").setLanguageKey("serverobserver.config.duration").setComment("Set the time such as ping interval");
 	}
 
-	public final ConfigProperty<Integer> durationMainMenu = propertyInteger(get("Duration", "MainMenu", 10, "Time until the multiplay screen is displayed after starting Minecraft (invalid with 0)").setMinValue(0).setLanguageKey("serverobserver.config.duration.mainmenu"));
-	public final ConfigProperty<Integer> durationPing = propertyInteger(get("Duration", "Ping", 10, "Ping interval (minimum: 10 seconds)").setMinValue(10).setLanguageKey("serverobserver.config.duration.ping"));
+	public final ConfigProperty<Integer> durationMainMenu = propertyInteger(get("Duration", "MainMenu", 15, "Time until the multiplay screen is displayed after starting Minecraft (invalid with 0)").setMinValue(0).setLanguageKey("serverobserver.config.duration.mainmenu"));
+	public final ConfigProperty<Integer> durationPing = propertyInteger(get("Duration", "Ping", 20, "Ping interval (minimum: 10 seconds)").setMinValue(10).setLanguageKey("serverobserver.config.duration.ping"));
 	public final ConfigProperty<Integer> durationAutoLogin = propertyInteger(get("Duration", "AutoLogin", 10, "Time from ping completion to automatic login (minimum: 10 seconds)").setMinValue(10).setLanguageKey("serverobserver.config.duration.autologin"));
-	public final ConfigProperty<Integer> durationDisconnected = propertyInteger(get("Duration", "Disconnected", 10, "The time from the disconnection screen to the display of the multiplay screen (Minimum: 10 seconds, less than 10 will not return to multiplay screen)").setMinValue(10).setLanguageKey("serverobserver.config.duration.disconnected"));
+	public final ConfigProperty<Integer> durationDisconnected = propertyInteger(get("Duration", "Disconnected", 30, "The time from the disconnection screen to the display of the multiplay screen (Minimum: 10 seconds, less than 10 will not return to multiplay screen)").setMinValue(10).setLanguageKey("serverobserver.config.duration.disconnected"));
 
 	{
 		getCategory("ObserveTarget").setLanguageKey("serverobserver.config.observetarget").setComment("Remember the server being monitored");
