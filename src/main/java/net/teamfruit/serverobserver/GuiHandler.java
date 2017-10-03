@@ -34,7 +34,7 @@ public class GuiHandler {
 	private final @Nonnull ICompat compat;
 
 	private GuiButton disableBackButton;
-	private @Nullable GuiButton mainMenuMultiPlayer;
+	private @Nullable GuiButton mainMenuButtonMulti;
 
 	public GuiHandler(final ICompat compat) {
 		this.compat = compat;
@@ -49,8 +49,8 @@ public class GuiHandler {
 		Timer.tick();
 		this.targetServerStatus = null;
 		final GuiScreen screen = this.mc.currentScreen;
-		this.mainMenuMultiPlayer = null;
 		final List<GuiButton> buttons = this.compat.getButtonList(e);
+		Log.log.info(String.format("opened: %s, buttons: %s", screen, buttons));
 		if (screen instanceof GuiMultiplayer) {
 			final GuiMultiplayer mpgui = (GuiMultiplayer) screen;
 			buttons.add(this.compat.createSkeletonButton(BUTTON_ID, mpgui.width-(5+180), 5, 180, 23, I18n.format("serverobserver.gui.mode"),
@@ -81,10 +81,9 @@ public class GuiHandler {
 		} else if (screen instanceof GuiMainMenu) {
 			for (final GuiButton button : buttons)
 				if (button.id==2)
-					this.mainMenuMultiPlayer = button;
+					this.mainMenuButtonMulti = button;
 			if (Config.getConfig().durationMainMenu.get()>0)
 				reset(Config.getConfig().durationMainMenu);
-			// Log.log.info("ready");
 		}
 	}
 
@@ -95,9 +94,11 @@ public class GuiHandler {
 		} else if (gui instanceof GuiDisconnected) {
 			if (this.disableBackButton!=null&&Config.getConfig().durationDisconnected.get()>=10)
 				this.disableBackButton.displayString = I18n.format("serverobserver.gui.backandstop.time", I18n.format("serverobserver.gui.backandstop"), timeremain());
-		} else if (gui instanceof GuiMainMenu)
-			if (this.mainMenuMultiPlayer!=null&&this.target.getIP()!=null&&!this.hasGuiOpened)
-				this.mainMenuMultiPlayer.displayString = I18n.format("serverobserver.gui.maintomulti.time", I18n.format("menu.multiplayer"), timeremain());
+		} else if (gui instanceof GuiMainMenu) {
+			final GuiButton button = this.mainMenuButtonMulti;
+			if (button!=null&&this.target.getIP()!=null&&!this.hasGuiOpened)
+				button.displayString = I18n.format("serverobserver.gui.maintomulti.time", I18n.format("menu.multiplayer"), timeremain());
+		}
 	}
 
 	private String displayText = "Disabled";

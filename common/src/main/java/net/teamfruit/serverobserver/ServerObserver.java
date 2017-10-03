@@ -48,9 +48,10 @@ public class ServerObserver {
 				try {
 					final File canonicalModsDir = modsDir.getCanonicalFile();
 					final File versionSpecificModsDir = new File(canonicalModsDir, mccversion);
+					final File modVersionSpecific = new File(versionSpecificModsDir, Reference.MODID);
 
 					final String jarname = String.format("%s.jar", mccversion);
-					final File destMod = new File(versionSpecificModsDir, jarname);
+					final File destMod = new File(modVersionSpecific, jarname);
 
 					file = new ZipFile(modFile);
 					stream = file.getInputStream(file.getEntry(jarname));
