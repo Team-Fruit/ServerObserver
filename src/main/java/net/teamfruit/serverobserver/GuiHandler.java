@@ -41,32 +41,7 @@ public class GuiHandler {
 	}
 
 	public interface SkeletonButtonDrawInside {
-		void drawInside(SkeletonButton button, final Minecraft mc, final int mouseX, final int mouseY, final int x, final int y);
-	}
-
-	public static class SkeletonButton extends GuiButton {
-		private final SkeletonButtonDrawInside inside;
-		private final ICompat compat;
-
-		public SkeletonButton(final ICompat compat, final int buttonId, final int x, final int y, final int widthIn, final int heightIn, final String buttonText, final SkeletonButtonDrawInside inside) {
-			super(buttonId, x, y, widthIn, heightIn, buttonText);
-			this.inside = inside;
-			this.compat = compat;
-		}
-
-		protected boolean isHovered;
-
-		public void drawButtonBack(final Minecraft mc, final int mouseX, final int mouseY) {
-			if (this.visible) {
-				this.compat.color(1.0F, 1.0F, 1.0F, 1.0F);
-				final int x = this.compat.getPositionX(this);
-				final int y = this.compat.getPositionY(this);
-				this.isHovered = mouseX>=x&&mouseY>=y&&mouseX<x+this.width&&mouseY<y+this.height;
-				mouseDragged(mc, mouseX, mouseY);
-				drawRect(x, y, x+this.width, y+this.height, 0xcc000000);
-				this.inside.drawInside(this, mc, mouseX, mouseY, x, y);
-			}
-		}
+		void drawInside(GuiButton button, final Minecraft mc, final int mouseX, final int mouseY, final int x, final int y);
 	}
 
 	@CoreEvent
