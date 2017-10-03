@@ -2,6 +2,8 @@ package net.teamfruit.serverobserver;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
@@ -22,6 +24,8 @@ import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
 
 public class Compat implements ICompat {
+	public static final @Nonnull ICompat compat = new Compat();
+
 	@Override
 	public void color(final float colorRed, final float colorGreen, final float colorBlue, final float colorAlpha) {
 		GL11.glColor4f(colorRed, colorGreen, colorBlue, colorAlpha);

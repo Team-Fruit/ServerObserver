@@ -10,7 +10,7 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void preInit(final @Nonnull FMLPreInitializationEvent event) {
 		super.preInit(event);
-		Config.init(event.getSuggestedConfigurationFile(), "1.0.0", ServerObserver.compat);
+		Config.init(event.getSuggestedConfigurationFile(), "1.0.0", Compat.compat);
 	}
 
 	@Override

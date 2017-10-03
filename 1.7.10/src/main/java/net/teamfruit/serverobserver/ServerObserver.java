@@ -7,7 +7,6 @@ import javax.annotation.Nullable;
 
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
 import cpw.mods.fml.common.SidedProxy;
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
@@ -17,13 +16,8 @@ import cpw.mods.fml.relauncher.Side;
 
 @Mod(modid = Reference.MODID, name = Reference.NAME, version = Reference.VERSION, guiFactory = Reference.GUI_FACTORY)
 public class ServerObserver {
-	@Instance(Reference.MODID)
-	public static @Nullable ServerObserver instance;
-
-	public static final @Nonnull ICompat compat = new Compat();
-
 	@SidedProxy(serverSide = Reference.PROXY_SERVER, clientSide = Reference.PROXY_CLIENT)
-	public static @Nullable IProxy proxy;
+	private static @Nullable IProxy proxy;
 
 	@NetworkCheckHandler
 	public boolean checkModList(final @Nonnull Map<String, String> versions, final @Nonnull Side side) {
