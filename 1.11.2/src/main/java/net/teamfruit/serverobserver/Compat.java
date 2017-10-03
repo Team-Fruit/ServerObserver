@@ -124,8 +124,8 @@ public class Compat implements ICompat {
 	}
 
 	@Override
-	public SkeletonButton createSkeletonButton(final GuiHandler handler, final int buttonId, final int x, final int y, final int widthIn, final int heightIn, final String buttonText, final SkeletonButtonDrawInside inside) {
-		return handler.new SkeletonButton(buttonId, x, y, widthIn, heightIn, buttonText, inside) {
+	public SkeletonButton createSkeletonButton(final int buttonId, final int x, final int y, final int widthIn, final int heightIn, final String buttonText, final SkeletonButtonDrawInside inside) {
+		return new SkeletonButton(this, buttonId, x, y, widthIn, heightIn, buttonText, inside) {
 			@Override
 			public void drawButton(final Minecraft mc, final int mouseX, final int mouseY) {
 				drawButtonBack(mc, mouseX, mouseY);

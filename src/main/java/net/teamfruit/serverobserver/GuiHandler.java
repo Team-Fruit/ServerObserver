@@ -44,21 +44,23 @@ public class GuiHandler {
 		void drawInside(SkeletonButton button, final Minecraft mc, final int mouseX, final int mouseY, final int x, final int y);
 	}
 
-	public class SkeletonButton extends GuiButton {
+	public static class SkeletonButton extends GuiButton {
 		private final SkeletonButtonDrawInside inside;
+		private final ICompat compat;
 
-		public SkeletonButton(final int buttonId, final int x, final int y, final int widthIn, final int heightIn, final String buttonText, final SkeletonButtonDrawInside inside) {
+		public SkeletonButton(final ICompat compat, final int buttonId, final int x, final int y, final int widthIn, final int heightIn, final String buttonText, final SkeletonButtonDrawInside inside) {
 			super(buttonId, x, y, widthIn, heightIn, buttonText);
 			this.inside = inside;
+			this.compat = compat;
 		}
 
 		protected boolean isHovered;
 
 		public void drawButtonBack(final Minecraft mc, final int mouseX, final int mouseY) {
 			if (this.visible) {
-				GuiHandler.this.compat.color(1.0F, 1.0F, 1.0F, 1.0F);
-				final int x = GuiHandler.this.compat.getPositionX(this);
-				final int y = GuiHandler.this.compat.getPositionY(this);
+				this.compat.color(1.0F, 1.0F, 1.0F, 1.0F);
+				final int x = this.compat.getPositionX(this);
+				final int y = this.compat.getPositionY(this);
 				this.isHovered = mouseX>=x&&mouseY>=y&&mouseX<x+this.width&&mouseY<y+this.height;
 				mouseDragged(mc, mouseX, mouseY);
 				drawRect(x, y, x+this.width, y+this.height, 0xcc000000);
@@ -76,7 +78,7 @@ public class GuiHandler {
 		final List<GuiButton> buttons = this.compat.getButtonList(e);
 		if (screen instanceof GuiMultiplayer) {
 			final GuiMultiplayer mpgui = (GuiMultiplayer) screen;
-			buttons.add(this.compat.createSkeletonButton(this, BUTTON_ID, mpgui.width-(5+180), 5, 180, 23, I18n.format("serverobserver.gui.mode"),
+			buttons.add(this.compat.createSkeletonButton(BUTTON_ID, mpgui.width-(5+180), 5, 180, 23, I18n.format("serverobserver.gui.mode"),
 					(
 							button, mc, mouseX, mouseY, x, y
 					) -> {

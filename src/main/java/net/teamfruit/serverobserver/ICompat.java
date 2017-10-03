@@ -57,6 +57,6 @@ public interface ICompat {
 
 	int getPositionY(GuiButton button);
 
-	SkeletonButton createSkeletonButton(GuiHandler handler, final int buttonId, final int x, final int y, final int widthIn, final int heightIn, final String buttonText, final SkeletonButtonDrawInside inside);
+	SkeletonButton createSkeletonButton(final int buttonId, final int x, final int y, final int widthIn, final int heightIn, final String buttonText, final SkeletonButtonDrawInside inside);
 
 }
