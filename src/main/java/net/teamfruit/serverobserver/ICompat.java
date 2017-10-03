@@ -14,6 +14,8 @@ import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
+import net.teamfruit.serverobserver.GuiHandler.SkeletonButton;
+import net.teamfruit.serverobserver.GuiHandler.SkeletonButtonDrawInside;
 
 public interface ICompat {
 
@@ -54,5 +56,7 @@ public interface ICompat {
 	int getPositionX(GuiButton button);
 
 	int getPositionY(GuiButton button);
+
+	SkeletonButton createSkeletonButton(GuiHandler handler, final int buttonId, final int x, final int y, final int widthIn, final int heightIn, final String buttonText, final SkeletonButtonDrawInside inside);
 
 }

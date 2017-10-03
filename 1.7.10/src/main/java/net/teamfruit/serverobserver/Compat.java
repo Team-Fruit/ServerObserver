@@ -19,6 +19,8 @@ import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
+import net.teamfruit.serverobserver.GuiHandler.SkeletonButton;
+import net.teamfruit.serverobserver.GuiHandler.SkeletonButtonDrawInside;
 
 public class Compat implements ICompat {
 	public static final @Nonnull ICompat compat = new Compat();
@@ -119,5 +121,15 @@ public class Compat implements ICompat {
 	@Override
 	public int getPositionY(final GuiButton button) {
 		return button.yPosition;
+	}
+
+	@Override
+	public SkeletonButton createSkeletonButton(final GuiHandler handler, final int buttonId, final int x, final int y, final int widthIn, final int heightIn, final String buttonText, final SkeletonButtonDrawInside inside) {
+		return handler.new SkeletonButton(buttonId, x, y, widthIn, heightIn, buttonText, inside) {
+			@Override
+			public void drawButton(final Minecraft mc, final int mouseX, final int mouseY) {
+				drawButtonBack(mc, mouseX, mouseY);
+			}
+		};
 	}
 }
