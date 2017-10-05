@@ -372,8 +372,10 @@ if (sec_curseforge_key!=null&&project.isProperty('extra_curseforge_id')) {
 				addGameVersion p.version_minecraft
 			}
 
+			/*
 			relations {
 			}
+			*/
 		}
 	}
 } else

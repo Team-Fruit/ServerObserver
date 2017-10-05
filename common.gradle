@@ -328,8 +328,10 @@ if (sec_curseforge_key!=null&&project.isProperty('extra_curseforge_id')) {
 				}
 			}
 
+			/*
 			relations {
 			}
+			*/
 		}
 	}
 } else
