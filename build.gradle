@@ -352,7 +352,6 @@ if (sec_curseforge_key!=null&&project.isProperty('extra_curseforge_id')) {
 		tasks.curseforge.enabled = !mod_autorelease
 
 		tasks.curseforge.dependsOn 'build'
-		tasks.curseforge.mustRunAfter 'signJars'
 		apiKey = sec_curseforge_key
 		project {
 			id = project.extra_curseforge_id
