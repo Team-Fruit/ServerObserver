@@ -230,8 +230,16 @@ public class GuiHandler {
 			}
 		} else if (screen instanceof GuiDisconnected) {
 			final GuiDisconnected dcgui = (GuiDisconnected) screen;
-			if (this.timer.getTime()>0)
-				dcgui.mc.displayGuiScreen(this.compat.getParentScreen(dcgui));
+			if (this.timer.getTime()>0) {
+				final GuiScreen screen2 = this.compat.getParentScreen(dcgui);
+				dcgui.mc.displayGuiScreen(screen2);
+				if (screen2 instanceof GuiMultiplayer) {
+					final GuiMultiplayer mpgui = (GuiMultiplayer) screen2;
+					final ServerData serverData = this.target.get(mpgui);
+					if (serverData!=null)
+						this.compat.setPinged(serverData, false);
+				}
+			}
 		} else if (screen instanceof GuiMainMenu) {
 			final GuiMainMenu mmgui = (GuiMainMenu) screen;
 			if (this.target.getIP()!=null&&!this.hasGuiOpened&&Config.getConfig().durationDisconnected.get()>=10)

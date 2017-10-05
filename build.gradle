@@ -295,9 +295,9 @@ if (sec_github_key!=null&&project.isProperty('extra_github_owner')&&project.isPr
 		draft = false
 		def allassets = [jar]
 		subprojects.each { p ->
-			allassets.addAll([p.tasks.shadowJar, p.tasks.jar, p.tasks.devJar, p.tasks.sourceJar, p.tasks.apiJar]*.outputs*.files*.asPath*.tr('\\','/'))
+			allassets.addAll([p.tasks.shadowJar, p.tasks.jar, p.tasks.devJar, p.tasks.sourceJar, p.tasks.apiJar])
 		}
-		assets = allassets
+		assets = allassets*.outputs*.files*.asPath*.tr('\\','/')
 	}
 }
 
