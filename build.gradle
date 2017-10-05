@@ -2,6 +2,7 @@ buildscript {
 }
 
 plugins {
+	id 'com.github.johnrengelman.shadow' version '2.0.1'
 	id 'com.palantir.git-version' version '0.7.1'
 	id 'co.riiid.gradle' version '0.4.2'
 	id 'com.jfrog.bintray' version '1.7.3'
@@ -345,3 +346,36 @@ if (sec_bintray_user!=null&&sec_bintray_key!=null&&project.isProperty('extra_bin
 	}
 } else
 	tasks.bintrayUpload.enabled = false
+
+if (sec_curseforge_key!=null&&project.isProperty('extra_curseforge_id')) {
+	curseforge {
+		tasks.curseforge.enabled = !mod_autorelease
+
+		tasks.curseforge.dependsOn 'build'
+		tasks.curseforge.mustRunAfter 'signJars'
+		apiKey = sec_curseforge_key
+		project {
+			id = project.extra_curseforge_id
+
+			changelogType = 'markdown'
+			changelog = mod_changelog
+
+			releaseType = mod_releasetype
+
+			mainArtifact(jar) {
+				displayName = "${jar.baseName}-${jar.version} Universal"
+			}
+
+			subprojects.each { p ->
+				if (p.version_minecraft=="1.7.10")
+					return
+
+				addGameVersion p.version_minecraft
+			}
+
+			relations {
+			}
+		}
+	}
+} else
+	tasks.curseforge.enabled = false
