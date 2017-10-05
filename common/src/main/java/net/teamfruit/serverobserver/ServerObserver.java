@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.zip.ZipFile;
 
 import javax.annotation.Nonnull;
@@ -11,6 +12,9 @@ import javax.annotation.Nullable;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+
+import com.google.common.collect.Maps;
 
 import net.minecraft.launchwrapper.Launch;
 import net.minecraftforge.fml.common.Loader;
@@ -36,7 +40,23 @@ public class ServerObserver {
 		final ModContainer container = Loader.instance().activeModContainer();
 		Log.log.info(container);
 		final Object[] data = FMLInjectionData.data();
-		final String mccversion = (String) data[4];
+		String mccversion = (String) data[4];
+
+		final Map<String, String> versions = Maps.newHashMap();
+		versions.put("1.8", "1.8.9");
+		versions.put("1.9", "1.9.4");
+		versions.put("1.10", "1.10.2");
+		versions.put("1.11", "1.11.2");
+		versions.put("1.12", "1.12");
+		for (final Entry<String, String> entry : versions.entrySet()) {
+			final String key = entry.getKey();
+			if (StringUtils.startsWith(mccversion, key)) {
+				final String value = entry.getValue();
+				mccversion = value;
+				break;
+			}
+		}
+
 		final File minecraftDir = (File) data[6];
 		final File modsDir = new File(minecraftDir, "mods");
 		if (container!=null) {
