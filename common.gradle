@@ -150,6 +150,8 @@ ext.commonManifest = {
 		attributes 'FMLCorePluginContainsFMLMod': project.extra_fmlcore
 	if (project.isProperty('extra_fmlat'))
 		attributes 'FMLAT': project.extra_fmlat
+	// Prevent from CurseForge duplicate error
+	attributes 'ModVersion': mod_version_full
 	attributes manifests.manifests
 }
 
@@ -306,7 +308,7 @@ gradle.taskGraph.whenReady {taskGraph ->
 }
 if (sec_curseforge_key!=null&&project.isProperty('extra_curseforge_id')) {
 	curseforge {
-		tasks.curseforge.enabled = !mod_autorelease
+		tasks.curseforge.enabled = !mod_autorelease && project.name!=mod_commonname
 
 		tasks.curseforge.dependsOn 'reobfShadowJar'
 		tasks.curseforge.mustRunAfter 'signJars'
@@ -322,7 +324,7 @@ if (sec_curseforge_key!=null&&project.isProperty('extra_curseforge_id')) {
 			mainArtifact(shadowJar) {
 				displayName = "${shadowJar.baseName}-${shadowJar.version}"
 			}
-			[jar, devJar, sourceJar, apiJar].each { jar ->
+			[/*jar, */devJar, sourceJar, apiJar].each { jar ->
 				addArtifact(jar) {
 					displayName = "${jar.baseName}-${jar.version}-${jar.classifier}"
 				}
