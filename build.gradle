@@ -151,7 +151,7 @@ ext {
 				.replace('{version_full}', mod_version_full)
 			if (mod_buildnumber!=null)
 				return str1
-					.replace('{version_number}', mod_buildnumber)
+					.replace('{version_number}', "${mod_buildnumber}")
 			return str1
 		}
 
