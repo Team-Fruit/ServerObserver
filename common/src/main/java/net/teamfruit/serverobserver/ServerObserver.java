@@ -47,7 +47,7 @@ public class ServerObserver {
 		versions.put("1.9", "1.9.4");
 		versions.put("1.10", "1.10.2");
 		versions.put("1.11", "1.11.2");
-		versions.put("1.12", "1.12");
+		versions.put("1.12", "1.12.2");
 		for (final Entry<String, String> entry : versions.entrySet()) {
 			final String key = entry.getKey();
 			if (StringUtils.startsWith(mccversion, key)) {
