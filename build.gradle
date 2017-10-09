@@ -375,9 +375,6 @@ if (sec_curseforge_key!=null&&project.isProperty('extra_curseforge_id')) {
 			}
 
 			subprojects.each { p ->
-				if (p.version_minecraft=="1.7.10")
-					return
-
 				addGameVersion p.version_minecraft
 			}
 
