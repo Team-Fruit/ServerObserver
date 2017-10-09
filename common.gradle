@@ -34,6 +34,21 @@ sourceSets {
 apply plugin: project.forgegradle_plugin
 def fg_plugin = plugins.findPlugin project.forgegradle_plugin
 
+sourceSets {
+	[[common: common_api, src: api], [common: common_main, src: main], [common: common_test, src: test]].each { s ->
+		s.common.java {
+			srcDirs = ["../src/${s.src.name}/java"]
+		}
+		s.common.resources {
+			srcDirs = ["../src/${s.src.name}/resources"]
+		}
+		s.common.compileClasspath += s.src.compileClasspath
+		s.common.runtimeClasspath += s.src.runtimeClasspath
+		s.src.compileClasspath += s.common.output
+		s.src.runtimeClasspath += s.common.output
+	}
+}
+
 // Fix compatibility issue between Gradle 4 and ForgeGradle 2.1
 if (project.forgegradle.contains('1.2') || project.forgegradle.contains('2.1'))
 	if (gradle.startParameter.logLevel.compareTo(org.gradle.api.logging.LogLevel.LIFECYCLE) >= 0)
@@ -93,22 +108,22 @@ task setupSourceSets {
 processResources {
 	// this will ensure that this task is redone when the versions change.
 	inputs.property 'version', mod_version
-	inputs.property 'mcversion', project.minecraft.version
+	inputs.property 'mcversion', project.version_minecraft
 
-	from(sourceSets.main.resources.srcDirs) {
+	from(sourceSets.common_main.resources.srcDirs) {
 		include 'mcmod.info'
 
-		expand([
+		/*expand([
 				'modid'		  : project.modid,
 				'modname'		: project.modname,
 				'version'		: mod_version,
 				'mcversion'	  : project.version_minecraft,
 				'forgeversion'   : project.version_forge,
 				'minforgeversion': project.isProperty('version_minforge') ? project.version_minforge : project.version_forge,
-		])
+		])*/
 	}
 
-	from(sourceSets.main.resources.srcDirs) {
+	from(sourceSets.common_main.resources.srcDirs) {
 		exclude 'mcmod.info'
 	}
 }
@@ -119,6 +134,10 @@ repositories {
 		name = 'CurseForge'
 		url = 'https://minecraft.curseforge.com/api/maven/'
 	}
+	maven {
+		name = 'Bintray TeamFruit'
+		url = "https://dl.bintray.com/team-fruit/mods/"
+	}
 }
 
 dependencies {
@@ -126,21 +145,9 @@ dependencies {
 	shade fileTree(dir: 'libs/shade', include: '*.jar')
 	compile fileTree(dir: '../libs', include: '*.jar')
 	shade fileTree(dir: '../libs/shade', include: '*.jar')
-}
 
-sourceSets {
-	[[common: common_api, src: api], [common: common_main, src: main], [common: common_test, src: test]].each { s ->
-		s.common.java {
-			srcDirs = ["../src/${s.src.name}/java"]
-		}
-		s.common.resources {
-			srcDirs = ["../src/${s.src.name}/resources"]
-		}
-		s.common.compileClasspath += s.src.compileClasspath
-		s.common.runtimeClasspath += s.src.runtimeClasspath
-		s.src.compileClasspath += s.common.output
-		s.src.runtimeClasspath += s.common.output
-	}
+	if (project.name==mod_commonname)
+		compile 'net.teamfruit:fmllegacydependency:1.0.2'
 }
 
 ext.commonManifest = {
@@ -173,6 +180,7 @@ jar {
 	classifier 'diff'
 	manifest commonManifest
 }
+tasks.jar.dependsOn 'shadowJar'
 
 // println !reobf.hasProperty('dependsOn')
 if (!reobf.hasProperty('dependsOn')) {

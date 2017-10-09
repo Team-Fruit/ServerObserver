@@ -17,7 +17,7 @@ import cpw.mods.fml.relauncher.Side;
 @Mod(modid = Reference.MODID, name = Reference.NAME, version = Reference.VERSION, guiFactory = Reference.GUI_FACTORY)
 public class ServerObserver {
 	@SidedProxy(serverSide = Reference.PROXY_SERVER, clientSide = Reference.PROXY_CLIENT)
-	private static @Nullable IProxy proxy;
+	private static @Nullable IProxyL proxy;
 
 	@NetworkCheckHandler
 	public boolean checkModList(final @Nonnull Map<String, String> versions, final @Nonnull Side side) {

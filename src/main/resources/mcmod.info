@@ -5,8 +5,8 @@
 			"modid": "serverobserver",
 			"name": "ServerObserver",
 			"description": "Observe Minecraft Server Status",
-			"mcversion": "${mcversion}",
-			"version": "${version}",
+			"mcversion": "",
+			"version": "",
 			"authorList": [
 				"Kamesuta"
 			],
@@ -18,7 +18,7 @@
 			"logoFile": "assets/serverobserver/textures/banner.png",
 			"screenshots": [],
 			"updateUrl": "https://github.com/Team-Fruit/ServerObserver/releases",
-			"url": "https://github.com/Team-Fruit/ServerObserver/releases",
+			"url": "https://minecraft.curseforge.com/projects/serverobserver",
 			"useDependencyInformation": false
 		}
 	]
