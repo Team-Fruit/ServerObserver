@@ -46,6 +46,7 @@ public class GuiHandler {
 
 	@CoreEvent
 	public void open(final InitGuiEvent.Post e) {
+		this.manualOpen = this.manual;
 		Timer.tick();
 		this.targetServerStatus = null;
 		final GuiScreen screen = this.mc.currentScreen;
@@ -85,6 +86,7 @@ public class GuiHandler {
 			if (Config.getConfig().durationMainMenu.get()>0)
 				reset(Config.getConfig().durationMainMenu);
 		}
+		this.manual = false;
 	}
 
 	@CoreEvent
@@ -96,7 +98,7 @@ public class GuiHandler {
 				this.disableBackButton.displayString = I18n.format("serverobserver.gui.backandstop.time", I18n.format("serverobserver.gui.backandstop"), timeremain());
 		} else if (gui instanceof GuiMainMenu) {
 			final GuiButton button = this.mainMenuButtonMulti;
-			if (button!=null&&this.target.getIP()!=null&&!this.hasGuiOpened)
+			if (button!=null&&this.target.getIP()!=null&&!this.manualOpen)
 				button.displayString = I18n.format("serverobserver.gui.maintomulti.time", I18n.format("menu.multiplayer"), timeremain());
 		}
 	}
@@ -106,6 +108,11 @@ public class GuiHandler {
 	private Boolean targetServerStatus;
 	private TargetServer target = new TargetServer();
 	private AutoLoginMode autologin = new AutoLoginMode();
+
+	@CoreEvent
+	public void action(final ActionPerformedEvent.Pre e) {
+		this.manual = true;
+	}
 
 	@CoreEvent
 	public void action(final ActionPerformedEvent.Post e) {
@@ -132,10 +139,11 @@ public class GuiHandler {
 			final GuiDisconnected dcgui = (GuiDisconnected) screen;
 			this.autologin.set(false);
 			this.target.set(null);
-			dcgui.mc.displayGuiScreen(this.compat.getParentScreen(dcgui));
+			this.mc.displayGuiScreen(this.compat.getParentScreen(dcgui));
 		}
 		this.displayTime = "";
 		reset(Config.getConfig().durationPing);
+		this.manual = false;
 	}
 
 	public class TargetServer {
@@ -188,17 +196,13 @@ public class GuiHandler {
 
 	private final Minecraft mc = Minecraft.getMinecraft();
 	private Timer timer = new Timer();
-	private boolean hasMainMenuOpened;
-	private boolean hasGuiOpened;
+	private boolean manual;
+	private boolean manualOpen;
 
 	@CoreEvent
 	public void tickclient() {
 		Timer.tick();
 		final GuiScreen screen = this.mc.currentScreen;
-		if (screen instanceof GuiMainMenu)
-			this.hasMainMenuOpened = true;
-		else if (this.hasMainMenuOpened)
-			this.hasGuiOpened = true;
 
 		if (screen instanceof GuiMultiplayer) {
 			final GuiMultiplayer mpgui = (GuiMultiplayer) screen;
@@ -231,18 +235,18 @@ public class GuiHandler {
 		} else if (screen instanceof GuiDisconnected) {
 			final GuiDisconnected dcgui = (GuiDisconnected) screen;
 			if (this.timer.getTime()>0) {
-				final GuiScreen screen2 = this.compat.getParentScreen(dcgui);
-				dcgui.mc.displayGuiScreen(screen2);
-				if (screen2 instanceof GuiMultiplayer) {
-					final GuiMultiplayer mpgui = (GuiMultiplayer) screen2;
-					final ServerData serverData = this.target.get(mpgui);
-					if (serverData!=null)
-						this.compat.setPinged(serverData, false);
-				}
+				GuiScreen screen2 = this.compat.getParentScreen(dcgui);
+				if (!(screen2 instanceof GuiMultiplayer))
+					screen2 = new GuiMultiplayer(screen2);
+				this.mc.displayGuiScreen(screen2);
+				final GuiMultiplayer mpgui = (GuiMultiplayer) screen2;
+				final ServerData serverData = this.target.get(mpgui);
+				if (serverData!=null)
+					this.compat.setPinged(serverData, false);
 			}
 		} else if (screen instanceof GuiMainMenu) {
 			final GuiMainMenu mmgui = (GuiMainMenu) screen;
-			if (this.target.getIP()!=null&&!this.hasGuiOpened&&Config.getConfig().durationDisconnected.get()>=10)
+			if (this.target.getIP()!=null&&!this.manualOpen&&Config.getConfig().durationDisconnected.get()>=10)
 				if (this.timer.getTime()>0)
 					this.mc.displayGuiScreen(new GuiMultiplayer(mmgui));
 		}

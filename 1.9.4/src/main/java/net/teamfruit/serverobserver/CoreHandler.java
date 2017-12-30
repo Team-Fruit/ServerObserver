@@ -38,6 +38,11 @@ public class CoreHandler {
 	}
 
 	@SubscribeEvent
+	public void action(final ActionPerformedEvent.Pre e) {
+		this.guiHandler.action(e);
+	}
+
+	@SubscribeEvent
 	public void action(final ActionPerformedEvent.Post e) {
 		this.guiHandler.action(e);
 	}
