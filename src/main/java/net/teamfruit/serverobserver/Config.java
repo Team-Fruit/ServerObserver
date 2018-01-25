@@ -46,4 +46,10 @@ public class Config extends ConfigBase {
 
 	public final ConfigProperty<String> notificationSound = propertyString(get("Notification", "Sound", compat!=null ? compat.getDefaultSound() : "", "Sound resource location").setLanguageKey("serverobserver.config.notification.sound"));
 	public final ConfigProperty<Double> notificationPitch = propertyDouble(get("Notification", "Pitch", 1.0, "Sound pitch (minimum: 0.0, maximum: 2.0)").setMinValue(0.0).setMaxValue(2.0).setLanguageKey("serverobserver.config.notification.pitch"));
+
+	{
+		getCategory("Miscellaneous").setLanguageKey("serverobserver.config.miscellaneous").setComment("Miscellaneous");
+	}
+
+	public final ConfigProperty<Boolean> miscInitServer = propertyBoolean(get("Miscellaneous", "InitServers", true, "Initialize server list").setLanguageKey("serverobserver.config.miscellaneous.initservers").setRequiresMcRestart(true));
 }

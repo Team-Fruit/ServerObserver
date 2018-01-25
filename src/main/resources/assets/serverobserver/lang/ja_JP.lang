@@ -30,3 +30,7 @@ serverobserver.config.notification.sound=サウンド
 serverobserver.config.notification.sound.tooltip=サウンドのリソース・ロケーション
 serverobserver.config.notification.pitch=ピッチ
 serverobserver.config.notification.pitch.tooltip=サウンドのピッチ (最小:0.0, 最大:2.0)
+serverobserver.config.miscellaneous=その他
+serverobserver.config.miscellaneous.tooltip=その他設定
+serverobserver.config.miscellaneous.initservers=サーバーリストを初期化
+serverobserver.config.miscellaneous.initservers.tooltip=servers.json からサーバーリストへサーバーを追加します

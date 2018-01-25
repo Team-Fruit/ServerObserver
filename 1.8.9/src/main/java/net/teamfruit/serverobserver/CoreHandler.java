@@ -1,5 +1,7 @@
 package net.teamfruit.serverobserver;
 
+import java.io.File;
+
 import javax.annotation.Nonnull;
 
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
@@ -15,6 +17,10 @@ public class CoreHandler {
 
 	public final @Nonnull Config configHandler = Config.getConfig();
 	public final @Nonnull GuiHandler guiHandler = new GuiHandler(Compat.compat);
+
+	public void preInit(final File root) {
+		this.guiHandler.init(root);
+	}
 
 	public void init() {
 		// FMLCommonHandler.instance().bus().register(this);

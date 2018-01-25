@@ -1,6 +1,11 @@
 package net.teamfruit.serverobserver;
 
+import java.io.File;
+import java.io.IOException;
+
 import javax.annotation.Nonnull;
+
+import org.apache.commons.io.FileUtils;
 
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -10,7 +15,17 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void preInit(final @Nonnull FMLPreInitializationEvent event) {
 		super.preInit(event);
-		Config.init(event.getSuggestedConfigurationFile(), "1.0.0", Compat.compat);
+		final File cfgDir = event.getModConfigurationDirectory();
+		final File modCfgDir = new File(cfgDir, Reference.MODID);
+		final File oldCfg = event.getSuggestedConfigurationFile();
+		final File cfg = new File(modCfgDir, Reference.MODID+".cfg");
+		if (oldCfg.exists())
+			try {
+				FileUtils.moveFile(oldCfg, cfg);
+			} catch (final IOException e) {
+			}
+		Config.init(cfg, "1.0.0", Compat.compat);
+		CoreHandler.instance.preInit(modCfgDir);
 	}
 
 	@Override

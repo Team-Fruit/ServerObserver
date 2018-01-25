@@ -1,7 +1,9 @@
 package net.teamfruit.serverobserver;
 
 import java.awt.Color;
+import java.io.File;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -9,6 +11,8 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.lwjgl.util.Timer;
+
+import com.google.common.collect.Sets;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -20,12 +24,15 @@ import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ServerListEntryNormal;
 import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.multiplayer.ServerList;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
 import net.teamfruit.serverobserver.ConfigBase.ConfigProperty;
+import net.teamfruit.serverobserver.DefaultServerList.ServerListModel;
+import net.teamfruit.serverobserver.DefaultServerList.ServerModel;
 
 public class GuiHandler {
 	private static final int BUTTON_ID = 31058;
@@ -110,6 +117,47 @@ public class GuiHandler {
 	private AutoLoginMode autologin = new AutoLoginMode();
 
 	@CoreEvent
+	public void init(final File root) {
+		final ConfigProperty<Boolean> initServer = Config.getConfig().miscInitServer;
+		if (initServer.get()) {
+			initServer.set(false);
+
+			final File serversFile = new File(root, "servers.json");
+			final ServerListModel model = new DefaultServerList().loadModel(serversFile);
+			if (model!=null) {
+				final ServerList list = new ServerList(this.mc);
+				list.loadServerList();
+				final List<ServerModel> servers = model.servers;
+				if (servers!=null) {
+					final Set<String> ipexists = Sets.newHashSet();
+					final int countserver = list.countServers();
+					for (int i = 0; i<countserver; i++) {
+						final ServerData data = list.getServerData(i);
+						if (data!=null)
+							ipexists.add(data.serverIP);
+					}
+					boolean dirty = false;
+					for (final ServerModel server : servers) {
+						final String serverIP = server.serverIP;
+						if (!ipexists.contains(serverIP)) {
+							list.addServerData(new ServerData(server.serverName, serverIP, false));
+							dirty = true;
+						}
+					}
+					if (dirty)
+						list.saveServerList();
+				}
+				final ServerModel server = model.autologin;
+				if (server!=null) {
+					this.targetServerStatus = null;
+					this.autologin.set(true);
+					this.target.set(new ServerData(server.serverName, server.serverIP, false));
+				}
+			}
+		}
+	}
+
+	@CoreEvent
 	public void action(final ActionPerformedEvent.Pre e) {
 		this.manual = true;
 	}
@@ -147,9 +195,7 @@ public class GuiHandler {
 	}
 
 	public class TargetServer {
-		private GuiMultiplayer mpgui_cache;
 		private ServerData target;
-		private String targetIP_cache;
 
 		public void set(final ServerData serverData) {
 			if (serverData==null) {
@@ -164,10 +210,8 @@ public class GuiHandler {
 
 		public ServerData get(final GuiMultiplayer mpgui) {
 			final String targetServerIP = Config.getConfig().targetServerIP.get();
-			if (mpgui!=this.mpgui_cache||!StringUtils.equals(this.targetIP_cache, targetServerIP)) {
-				this.target = getServerData(mpgui, getTarget(mpgui, this.targetIP_cache = targetServerIP));
-				this.mpgui_cache = mpgui;
-			}
+			if (this.target==null||!StringUtils.equals(this.target.serverIP, targetServerIP))
+				this.target = getServerData(mpgui, getTarget(mpgui, targetServerIP));
 			return this.target;
 		}
 

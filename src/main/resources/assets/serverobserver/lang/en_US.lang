@@ -30,3 +30,7 @@ serverobserver.config.notification.sound=Sound
 serverobserver.config.notification.sound.tooltip=Sound resource location
 serverobserver.config.notification.pitch=Pitch
 serverobserver.config.notification.pitch.tooltip=Sound pitch (minimum: 0.0, maximum: 2.0)
+serverobserver.config.miscellaneous=Miscellaneous
+serverobserver.config.miscellaneous.tooltip=Miscellaneous
+serverobserver.config.miscellaneous.initservers=Initialize server list
+serverobserver.config.miscellaneous.initservers.tooltip=Add servers to the list from servers.json
