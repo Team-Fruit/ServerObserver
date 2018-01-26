@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 
 import org.apache.commons.io.FileUtils;
 
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -24,7 +25,8 @@ public class ClientProxy extends CommonProxy {
 				FileUtils.moveFile(oldCfg, cfg);
 			} catch (final IOException e) {
 			}
-		Config.init(cfg, "1.0.0", Compat.compat);
+		final File dynCfg = new File(Minecraft.getMinecraft().mcDataDir, Reference.MODID+".cfg");
+		Config.init(cfg, dynCfg, "1.0.0", Compat.compat);
 		CoreHandler.instance.preInit(modCfgDir);
 	}
 

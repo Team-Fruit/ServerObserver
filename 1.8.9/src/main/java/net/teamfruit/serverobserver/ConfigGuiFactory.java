@@ -35,10 +35,14 @@ public class ConfigGuiFactory implements IModGuiFactory {
 
 		private static @Nonnull List<IConfigElement> getConfigElements() {
 			final List<IConfigElement> list = new ArrayList<IConfigElement>();
+			getConfigElements(list, Config.getConfig().getBase());
+			getConfigElements(list, Config.getConfig().getBaseDynamic());
+			return list;
+		}
 
+		private static @Nonnull List<IConfigElement> getConfigElements(final List<IConfigElement> list, final ConfigBase cb) {
 			ConfigCategory general = null;
 
-			final ConfigBase cb = Config.getConfig();
 			for (final String cat : cb.getCategoryNames()) {
 				final ConfigCategory cc = cb.getCategory(cat);
 

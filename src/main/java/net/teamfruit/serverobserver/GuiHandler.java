@@ -201,7 +201,7 @@ public class GuiHandler {
 			if (serverData==null) {
 				setIP(null);
 				this.target = null;
-				Config.getConfig().save();
+				Config.getConfig().getBase().save();
 			} else {
 				setIP(serverData.serverIP);
 				this.target = serverData;
@@ -230,7 +230,7 @@ public class GuiHandler {
 	public class AutoLoginMode {
 		public void set(final boolean enabled) {
 			Config.getConfig().targetAutoLogin.set(enabled);
-			Config.getConfig().save();
+			Config.getConfig().getBase().save();
 		}
 
 		public boolean is() {
