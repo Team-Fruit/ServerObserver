@@ -22,7 +22,6 @@ public class DefaultServerList {
 	}
 
 	public static class ServerListModel {
-		public ServerModel autologin;
 		public List<ServerModel> servers;
 	}
 

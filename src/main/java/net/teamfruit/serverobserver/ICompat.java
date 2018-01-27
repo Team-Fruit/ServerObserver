@@ -1,16 +1,18 @@
 package net.teamfruit.serverobserver;
 
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
+
+import javax.annotation.Nonnull;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiDisconnected;
-import net.minecraft.client.gui.GuiListExtended.IGuiListEntry;
 import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.ServerListEntryNormal;
 import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.multiplayer.ServerList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
@@ -32,11 +34,13 @@ public interface ICompat {
 
 	int getSelected(GuiMultiplayer mpgui);
 
-	void connectToServer(GuiMultiplayer mpgui, ServerData serverData);
+	void connectToServer(GuiMultiplayer mpgui, @Nonnull ServerData serverData);
 
-	boolean getPinged(ServerData serverData);
+	boolean getPinged(@Nonnull ServerData serverData);
 
-	void setPinged(ServerData serverData, boolean pinged);
+	void setPinged(@Nonnull ServerData serverData, boolean pinged);
+
+	void ping(GuiMultiplayer mpgui, @Nonnull ServerData serverData) throws Exception;
 
 	String getDefaultSound();
 
@@ -44,14 +48,13 @@ public interface ICompat {
 
 	void selectServer(GuiMultiplayer mpgui, int index);
 
-	int countServers(GuiMultiplayer mpgui);
-
+	@Deprecated
 	ServerData getServerData(GuiMultiplayer mpgui, int index);
 
-	IGuiListEntry getListEntry(GuiMultiplayer mpgui, int index);
-
-	ServerData getServerData(ServerListEntryNormal entry);
+	ServerList getServerList(GuiMultiplayer mpgui);
 
 	GuiButton createSkeletonButton(final int buttonId, final int x, final int y, final int widthIn, final int heightIn, final String buttonText, final SkeletonButtonDrawInside inside);
+
+	ThreadPoolExecutor getThreadPool();
 
 }

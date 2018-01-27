@@ -2,6 +2,7 @@ package net.teamfruit.serverobserver;
 
 import java.awt.Color;
 import java.io.File;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Set;
 
@@ -9,6 +10,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.lwjgl.util.Timer;
 
@@ -18,11 +20,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiDisconnected;
-import net.minecraft.client.gui.GuiListExtended.IGuiListEntry;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.ServerListEntryNormal;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
 import net.minecraft.client.resources.I18n;
@@ -51,6 +51,8 @@ public class GuiHandler {
 		void drawInside(GuiButton button, final Minecraft mc, final int mouseX, final int mouseY, final int x, final int y);
 	}
 
+	private boolean isFirstOpen = true;
+
 	@CoreEvent
 	public void open(final InitGuiEvent.Post e) {
 		this.manualOpen = this.manual;
@@ -76,17 +78,24 @@ public class GuiHandler {
 								mpgui.drawString(font, "...", x+4+font.getStringWidth(text), y+12, Color.GRAY.getRGB());
 						}
 					}));
-			selectTarget(mpgui, this.target.getIP());
+			selectTarget(mpgui, this.target.getServerIP());
 			reset(Config.getConfig().durationPing);
 		} else if (screen instanceof GuiDisconnected) {
 			final GuiDisconnected dcgui = (GuiDisconnected) screen;
-			if (this.target.getIP()!=null)
+			if (this.target.getServerIP()!=null)
 				buttons.add(
 						this.disableBackButton = new GuiButton(DISABLE_BACK_BUTTON_ID,
 								dcgui.width/2-100, this.compat.getHeight(dcgui),
 								I18n.format("serverobserver.gui.backandstop", 0f)));
 			reset(Config.getConfig().durationDisconnected);
 		} else if (screen instanceof GuiMainMenu) {
+			if (this.isFirstOpen)
+				if (Config.getConfig().startAndConnect.get()) {
+					final ServerData server = this.target.get(null);
+					if (server!=null)
+						this.compat.connectToServer(new GuiMultiplayer(screen), server);
+				} else if (Config.getConfig().startWithMultiplayerMenu.get())
+					this.mc.displayGuiScreen(new GuiMultiplayer(screen));
 			for (final GuiButton button : buttons)
 				if (button.id==2)
 					this.mainMenuButtonMulti = button;
@@ -94,6 +103,7 @@ public class GuiHandler {
 				reset(Config.getConfig().durationMainMenu);
 		}
 		this.manual = false;
+		this.isFirstOpen = false;
 	}
 
 	@CoreEvent
@@ -105,7 +115,7 @@ public class GuiHandler {
 				this.disableBackButton.displayString = I18n.format("serverobserver.gui.backandstop.time", I18n.format("serverobserver.gui.backandstop"), timeremain());
 		} else if (gui instanceof GuiMainMenu) {
 			final GuiButton button = this.mainMenuButtonMulti;
-			if (button!=null&&this.target.getIP()!=null&&!this.manualOpen)
+			if (button!=null&&this.target.getServerIP()!=null&&!this.manualOpen)
 				button.displayString = I18n.format("serverobserver.gui.maintomulti.time", I18n.format("menu.multiplayer"), timeremain());
 		}
 	}
@@ -147,12 +157,6 @@ public class GuiHandler {
 					if (dirty)
 						list.saveServerList();
 				}
-				final ServerModel server = model.autologin;
-				if (server!=null) {
-					this.targetServerStatus = null;
-					this.autologin.set(true);
-					this.target.set(new ServerData(server.serverName, server.serverIP, false));
-				}
 			}
 		}
 	}
@@ -169,9 +173,13 @@ public class GuiHandler {
 		final int id = this.compat.getButton(e).id;
 		if (screen instanceof GuiMultiplayer&&id==BUTTON_ID) {
 			final GuiMultiplayer mpgui = (GuiMultiplayer) screen;
-			final ServerData server = getServerData(mpgui, this.compat.getSelected(mpgui));
+			final ServerList serverList = this.compat.getServerList(mpgui);
+			final int serverindex = this.compat.getSelected(mpgui);
+			ServerData server = null;
+			if (0<=serverindex&&serverindex<serverList.countServers())
+				server = serverList.getServerData(serverindex);
 			if (server!=null) {
-				if (!StringUtils.equals(this.target.getIP(), server.serverIP)) {
+				if (!StringUtils.equals(this.target.getServerIP(), server.serverIP)) {
 					this.autologin.set(false);
 					this.target.set(server);
 				} else if (!this.autologin.is()) {
@@ -182,7 +190,7 @@ public class GuiHandler {
 					this.target.set(null);
 				}
 			} else
-				selectTarget(mpgui, this.target.getIP());
+				selectTarget(mpgui, this.target.getServerIP());
 		} else if (screen instanceof GuiDisconnected&&id==DISABLE_BACK_BUTTON_ID) {
 			final GuiDisconnected dcgui = (GuiDisconnected) screen;
 			this.autologin.set(false);
@@ -199,27 +207,36 @@ public class GuiHandler {
 
 		public void set(final ServerData serverData) {
 			if (serverData==null) {
-				setIP(null);
+				setServer(null, null);
 				this.target = null;
-				Config.getConfig().getBase().save();
 			} else {
-				setIP(serverData.serverIP);
+				setServer(serverData.serverName, serverData.serverIP);
 				this.target = serverData;
 			}
 		}
 
-		public ServerData get(final GuiMultiplayer mpgui) {
-			final String targetServerIP = Config.getConfig().targetServerIP.get();
+		public @Nullable ServerData get(final GuiMultiplayer mpgui) {
+			final String targetServerIP = getServerIP();
+			if (targetServerIP==null)
+				return null;
 			if (this.target==null||!StringUtils.equals(this.target.serverIP, targetServerIP))
-				this.target = getServerData(mpgui, getTarget(mpgui, targetServerIP));
+				this.target = getServerData(mpgui, getServerName(), targetServerIP, true);
 			return this.target;
 		}
 
-		public void setIP(final String ip) {
+		public void setServer(final String name, final String ip) {
+			Config.getConfig().targetServerName.set(StringUtils.defaultString(name));
 			Config.getConfig().targetServerIP.set(StringUtils.defaultString(ip));
 		}
 
-		public String getIP() {
+		public String getServerName() {
+			final String name = Config.getConfig().targetServerName.get();
+			if (!StringUtils.isEmpty(name))
+				return name;
+			return null;
+		}
+
+		public String getServerIP() {
 			final String ip = Config.getConfig().targetServerIP.get();
 			if (!StringUtils.isEmpty(ip))
 				return ip;
@@ -288,12 +305,10 @@ public class GuiHandler {
 				if (serverData!=null)
 					this.compat.setPinged(serverData, false);
 			}
-		} else if (screen instanceof GuiMainMenu) {
-			final GuiMainMenu mmgui = (GuiMainMenu) screen;
-			if (this.target.getIP()!=null&&!this.manualOpen&&Config.getConfig().durationDisconnected.get()>=10)
+		} else if (screen instanceof GuiMainMenu)
+			if (this.target.getServerIP()!=null&&!this.manualOpen&&Config.getConfig().durationDisconnected.get()>=10)
 				if (this.timer.getTime()>0)
-					this.mc.displayGuiScreen(new GuiMultiplayer(mmgui));
-		}
+					this.mc.displayGuiScreen(new GuiMultiplayer(screen));
 	}
 
 	private void reset(final ConfigProperty<Integer> time) {
@@ -316,21 +331,54 @@ public class GuiHandler {
 	}
 
 	private int getTarget(final GuiMultiplayer mpgui, final String serverIP) {
-		final int count = this.compat.countServers(mpgui);
-		for (int i = 0; i<count; i++) {
-			final ServerData serverData = this.compat.getServerData(mpgui, i);
+		final ServerList serverList = this.compat.getServerList(mpgui);
+		final int countserver = serverList.countServers();
+		for (int i = 0; i<countserver; i++) {
+			final ServerData serverData = serverList.getServerData(i);
 			if (StringUtils.equals(serverIP, serverData.serverIP))
 				return i;
 		}
 		return -1;
 	}
 
-	private ServerData getServerData(final GuiMultiplayer mpgui, final int index) {
-		if (index<0)
-			return null;
-		final IGuiListEntry guilistextended$iguilistentry = this.compat.getListEntry(mpgui, index);
-		if (guilistextended$iguilistentry instanceof ServerListEntryNormal)
-			return this.compat.getServerData((ServerListEntryNormal) guilistextended$iguilistentry);
-		return null;
+	private ServerData getServerData(final GuiMultiplayer mpgui, String name, final @Nonnull String ip, final boolean doPing) {
+		Validate.notNull(ip, "Internal Error: serverIP is null");
+		ServerList serverList = null;
+		if (mpgui!=null)
+			serverList = this.compat.getServerList(mpgui);
+		if (serverList!=null) {
+			ServerData server = null;
+			final int serverIndex = getTarget(mpgui, ip);
+			if (serverIndex>=0)
+				server = serverList.getServerData(serverIndex);
+			if (server!=null)
+				return server;
+		}
+		if (name==null)
+			name = ip;
+		final ServerData server = new ServerData(name, ip, false);
+		if (doPing)
+			ping(mpgui, server);
+		return server;
+	}
+
+	private void ping(final GuiMultiplayer mpgui, final ServerData serverData) {
+		if (!this.compat.getPinged(serverData)) {
+			this.compat.setPinged(serverData, true);
+			serverData.pingToServer = -2L;
+			serverData.serverMOTD = "";
+			serverData.populationInfo = "";
+			this.compat.getThreadPool().submit(() -> {
+				try {
+					this.compat.ping(mpgui, serverData);
+				} catch (final UnknownHostException unknownhostexception) {
+					serverData.pingToServer = -1L;
+					serverData.serverMOTD = "\u00a74Can\'t resolve hostname";
+				} catch (final Exception exception) {
+					serverData.pingToServer = -1L;
+					serverData.serverMOTD = "\u00a74Can\'t connect to server.";
+				}
+			});
+		}
 	}
 }

@@ -1,6 +1,7 @@
 package net.teamfruit.serverobserver;
 
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.annotation.Nonnull;
 
@@ -12,11 +13,11 @@ import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiDisconnected;
-import net.minecraft.client.gui.GuiListExtended.IGuiListEntry;
 import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ServerListEntryNormal;
 import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.multiplayer.ServerList;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
@@ -78,6 +79,11 @@ public class Compat implements ICompat {
 	}
 
 	@Override
+	public void ping(final GuiMultiplayer mpgui, final ServerData serverData) throws Exception {
+		mpgui.getOldServerPinger().ping(serverData);
+	}
+
+	@Override
 	public String getDefaultSound() {
 		return SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP.getSoundName().toString();
 	}
@@ -93,28 +99,23 @@ public class Compat implements ICompat {
 	}
 
 	@Override
-	public int countServers(final GuiMultiplayer mpgui) {
-		return mpgui.getServerList().countServers();
-	}
-
-	@Override
 	public ServerData getServerData(final GuiMultiplayer mpgui, final int index) {
 		return mpgui.getServerList().getServerData(index);
 	}
 
 	@Override
-	public IGuiListEntry getListEntry(final GuiMultiplayer mpgui, final int index) {
-		return mpgui.serverListSelector.getListEntry(index);
-	}
-
-	@Override
-	public ServerData getServerData(final ServerListEntryNormal entry) {
-		return entry.getServerData();
+	public ServerList getServerList(final GuiMultiplayer mpgui) {
+		return mpgui.getServerList();
 	}
 
 	@Override
 	public GuiButton createSkeletonButton(final int buttonId, final int x, final int y, final int widthIn, final int heightIn, final String buttonText, final SkeletonButtonDrawInside inside) {
 		return new SkeletonButton(this, buttonId, x, y, widthIn, heightIn, buttonText, inside);
+	}
+
+	@Override
+	public ThreadPoolExecutor getThreadPool() {
+		return ServerListEntryNormal.EXECUTOR;
 	}
 
 	public static class SkeletonButton extends GuiButton {
