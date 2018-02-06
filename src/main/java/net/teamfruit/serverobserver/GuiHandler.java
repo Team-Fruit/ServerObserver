@@ -204,6 +204,8 @@ public class GuiHandler {
 
 	public class TargetServer {
 		private ServerData target;
+		private GuiMultiplayer mpgui_cache;
+		private String targetIP_cache;
 
 		public void set(final ServerData serverData) {
 			if (serverData==null) {
@@ -219,8 +221,11 @@ public class GuiHandler {
 			final String targetServerIP = getServerIP();
 			if (targetServerIP==null)
 				return null;
-			if (this.target==null||!StringUtils.equals(this.target.serverIP, targetServerIP))
+			if (mpgui!=this.mpgui_cache||!StringUtils.equals(this.targetIP_cache, targetServerIP)) {
 				this.target = getServerData(mpgui, getServerName(), targetServerIP, true);
+				this.targetIP_cache = targetServerIP;
+				this.mpgui_cache = mpgui;
+			}
 			return this.target;
 		}
 

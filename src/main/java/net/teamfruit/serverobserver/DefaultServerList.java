@@ -13,12 +13,13 @@ public class DefaultServerList {
 	public final Gson gson = new Gson();
 
 	public ServerListModel loadModel(final File file) {
-		try (JsonReader reader = new JsonReader(new InputStreamReader(new FileInputStream(file), Charsets.UTF_8))) {
-			return this.gson.fromJson(reader, ServerListModel.class);
-		} catch (final Exception e) {
-			Log.log.warn("Could not load "+file.getName(), e);
-			return null;
-		}
+		if (file.exists())
+			try (JsonReader reader = new JsonReader(new InputStreamReader(new FileInputStream(file), Charsets.UTF_8))) {
+				return this.gson.fromJson(reader, ServerListModel.class);
+			} catch (final Exception e) {
+				Log.log.warn("Could not load "+file.getName(), e);
+			}
+		return null;
 	}
 
 	public static class ServerListModel {
