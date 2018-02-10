@@ -23,6 +23,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.teamfruit.serverobserver.GuiHandler.SkeletonButtonDrawInside;
 
 public class Compat implements ICompat {
@@ -64,8 +65,8 @@ public class Compat implements ICompat {
 	}
 
 	@Override
-	public void connectToServer(final GuiMultiplayer mpgui, final ServerData serverData) {
-		mpgui.connectToServer(serverData);
+	public void connectToServer(final GuiScreen mpgui, final ServerData serverData) {
+		FMLClientHandler.instance().connectToServer(mpgui, serverData);
 	}
 
 	@Override

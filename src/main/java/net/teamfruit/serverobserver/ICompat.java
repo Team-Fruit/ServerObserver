@@ -34,7 +34,7 @@ public interface ICompat {
 
 	int getSelected(GuiMultiplayer mpgui);
 
-	void connectToServer(GuiMultiplayer mpgui, @Nonnull ServerData serverData);
+	void connectToServer(GuiScreen mpgui, @Nonnull ServerData serverData);
 
 	boolean getPinged(@Nonnull ServerData serverData);
 

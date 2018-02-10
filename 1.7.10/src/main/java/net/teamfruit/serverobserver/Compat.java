@@ -7,6 +7,7 @@ import javax.annotation.Nonnull;
 
 import org.lwjgl.opengl.GL11;
 
+import cpw.mods.fml.client.FMLClientHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.gui.FontRenderer;
@@ -62,8 +63,8 @@ public class Compat implements ICompat {
 	}
 
 	@Override
-	public void connectToServer(final GuiMultiplayer mpgui, final ServerData serverData) {
-		mpgui.func_146791_a(serverData);
+	public void connectToServer(final GuiScreen mpgui, final ServerData serverData) {
+		FMLClientHandler.instance().connectToServer(mpgui, serverData);
 	}
 
 	@Override
