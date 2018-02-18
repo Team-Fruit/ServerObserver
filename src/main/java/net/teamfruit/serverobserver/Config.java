@@ -24,6 +24,7 @@ public class Config {
 	public final ConfigProperty<Double> notificationPitch;
 	public final ConfigProperty<Boolean> startWithMultiplayerMenu;
 	public final ConfigProperty<Boolean> startAndConnect;
+	public final ConfigProperty<Boolean> ignorePopulation;
 
 	public final ConfigProperty<String> targetServerName;
 	public final ConfigProperty<String> targetServerIP;
@@ -52,6 +53,7 @@ public class Config {
 		this.config.getCategory("Miscellaneous").setLanguageKey("serverobserver.config.miscellaneous").setComment("Miscellaneous");
 		this.startWithMultiplayerMenu = this.config.propertyBoolean(this.config.get("Miscellaneous", "StartWithMultiplayerMenu", false, "After game initialized, show multiplayer menu").setLanguageKey("serverobserver.config.miscellaneous.startwithmultiplayermenu").setRequiresMcRestart(true));
 		this.startAndConnect = this.config.propertyBoolean(this.config.get("Miscellaneous", "StartAndConnect", false, "After game initialized, connect to the server").setLanguageKey("serverobserver.config.miscellaneous.startandconnect").setRequiresMcRestart(true));
+		this.ignorePopulation = this.config.propertyBoolean(this.config.get("Miscellaneous", "IgnorePopulation", false, "Try connection if server is full").setLanguageKey("serverobserver.config.miscellaneous.ignorepopulation"));
 
 		// init dynamic config
 		this.dynamicconfig = new ConfigBase(dynamicFile, version);

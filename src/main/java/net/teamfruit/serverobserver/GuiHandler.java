@@ -347,7 +347,24 @@ public class GuiHandler {
 			final ServerData serverData = this.target.get(mpgui);
 			if (serverData!=null) {
 				final Boolean before = this.targetServerStatus;
-				this.targetServerStatus = this.compat.getPinged(serverData)&&serverData.pingToServer>=0;
+				boolean checkPopulation = true;
+				if (!Config.getConfig().ignorePopulation.get()) {
+					final String populationFormatted = serverData.populationInfo;
+					if (populationFormatted!=null) {
+						final String population = populationFormatted.replaceAll("\u00A7[0-9a-fklmnor]", "");
+						if (StringUtils.contains(population, "/")) {
+							final String strBefore = StringUtils.substringBefore(population, "/");
+							final String strAfter = StringUtils.substringAfterLast(population, "/");
+							try {
+								final int current = Integer.parseInt(strBefore);
+								final int overall = Integer.parseInt(strAfter);
+								checkPopulation = current<overall;
+							} catch (final NumberFormatException e) {
+							}
+						}
+					}
+				}
+				this.targetServerStatus = this.compat.getPinged(serverData)&&serverData.pingToServer>=0&&checkPopulation;
 				// Log.log.info("pinged: {}, pingms: {}", serverData.pinged, serverData.pingToServer);
 				if (this.targetServerStatus)
 					if (before!=null&&!before) {
