@@ -2,6 +2,8 @@ package net.teamfruit.serverobserver;
 
 import java.awt.Color;
 import java.io.File;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.util.List;
 import java.util.Set;
@@ -20,12 +22,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiDisconnected;
+import net.minecraft.client.gui.GuiIngameMenu;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.network.NetworkManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent;
@@ -42,6 +46,8 @@ public class GuiHandler {
 
 	private GuiButton disableBackButton;
 	private @Nullable GuiButton mainMenuButtonMulti;
+
+	private GuiMultiplayer lastGuiMultiplayer;
 
 	public GuiHandler(final ICompat compat) {
 		this.compat = compat;
@@ -62,7 +68,7 @@ public class GuiHandler {
 		final List<GuiButton> buttons = this.compat.getButtonList(e);
 		// Log.log.info(String.format("opened: %s, buttons: %s", screen, buttons));
 		if (screen instanceof GuiMultiplayer) {
-			final GuiMultiplayer mpgui = (GuiMultiplayer) screen;
+			final GuiMultiplayer mpgui = this.lastGuiMultiplayer = (GuiMultiplayer) screen;
 			buttons.add(this.compat.createSkeletonButton(BUTTON_ID, mpgui.width-(5+180), 5, 180, 23, I18n.format("serverobserver.gui.mode"),
 					(
 							button, mc, mouseX, mouseY, x, y
@@ -80,6 +86,23 @@ public class GuiHandler {
 					}));
 			selectTarget(mpgui, this.target.getServerIP());
 			reset(Config.getConfig().durationPing);
+		} else if (screen instanceof GuiIngameMenu) {
+			final GuiIngameMenu imgui = (GuiIngameMenu) screen;
+			buttons.add(this.compat.createSkeletonButton(BUTTON_ID, imgui.width-(5+180), 5, 180, 23, I18n.format("serverobserver.gui.mode"),
+					(
+							button, mc, mouseX, mouseY, x, y
+					) -> {
+						final ServerData serverData = this.target.get(null);
+						final FontRenderer font = GuiHandler.this.compat.font(mc);
+						GuiHandler.this.displayText = serverData!=null ? GuiHandler.this.autologin.is() ? "serverobserver.gui.mode.1" : "serverobserver.gui.mode.2" : "serverobserver.gui.mode.3";
+						imgui.drawString(font, I18n.format(GuiHandler.this.displayText, ""), x+4, y+3, Color.WHITE.getRGB());
+						if (serverData!=null) {
+							final String text = font.trimStringToWidth(serverData.serverName, button.width-(4*2+font.getStringWidth("...")));
+							imgui.drawString(font, text, x+4, y+12, Color.GRAY.getRGB());
+							if (!StringUtils.equals(serverData.serverName, text))
+								imgui.drawString(font, "...", x+4+font.getStringWidth(text), y+12, Color.GRAY.getRGB());
+						}
+					}));
 		} else if (screen instanceof GuiDisconnected) {
 			final GuiDisconnected dcgui = (GuiDisconnected) screen;
 			if (this.target.getServerIP()!=null)
@@ -93,9 +116,9 @@ public class GuiHandler {
 				if (Config.getConfig().startAndConnect.get()) {
 					final ServerData server = this.target.get(null);
 					if (server!=null)
-						this.compat.connectToServer(new GuiMultiplayer(screen), server);
+						this.compat.connectToServer(newGuiMultiplayer(screen), server);
 				} else if (Config.getConfig().startWithMultiplayerMenu.get())
-					this.mc.displayGuiScreen(new GuiMultiplayer(screen));
+					this.mc.displayGuiScreen(newGuiMultiplayer(screen));
 			for (final GuiButton button : buttons)
 				if (button.id==2)
 					this.mainMenuButtonMulti = button;
@@ -110,6 +133,7 @@ public class GuiHandler {
 	public void draw(final DrawScreenEvent.Post e) {
 		final GuiScreen gui = this.mc.currentScreen;
 		if (gui instanceof GuiMultiplayer) {
+		} else if (gui instanceof GuiIngameMenu) {
 		} else if (gui instanceof GuiDisconnected) {
 			if (this.disableBackButton!=null&&Config.getConfig().durationDisconnected.get()>=10)
 				this.disableBackButton.displayString = I18n.format("serverobserver.gui.backandstop.time", I18n.format("serverobserver.gui.backandstop"), timeremain());
@@ -118,6 +142,10 @@ public class GuiHandler {
 			if (button!=null&&this.target.getServerIP()!=null&&!this.manualOpen)
 				button.displayString = I18n.format("serverobserver.gui.maintomulti.time", I18n.format("menu.multiplayer"), timeremain());
 		}
+	}
+
+	private GuiMultiplayer newGuiMultiplayer(final GuiScreen parent) {
+		return this.lastGuiMultiplayer = new GuiMultiplayer(parent);
 	}
 
 	private String displayText = "Disabled";
@@ -161,6 +189,22 @@ public class GuiHandler {
 		}
 	}
 
+	public @Nullable InetSocketAddress getConnectedServer() {
+		try {
+			final NetworkManager t = this.compat.getClientToServerNetworkManager();
+			if (t!=null) {
+				final SocketAddress socketAddress = this.compat.getSocketAddress(t);
+				if (socketAddress!=null&&socketAddress instanceof InetSocketAddress) {
+					final InetSocketAddress inetAddr = (InetSocketAddress) socketAddress;
+					return inetAddr;
+				}
+			}
+		} catch (final Throwable e) {
+			Log.log.error("Couldn\'t get server name: ", e);
+		}
+		return null;
+	}
+
 	@CoreEvent
 	public void action(final ActionPerformedEvent.Pre e) {
 		this.manual = true;
@@ -191,6 +235,34 @@ public class GuiHandler {
 				}
 			} else
 				selectTarget(mpgui, this.target.getServerIP());
+		} else if (screen instanceof GuiIngameMenu&&id==BUTTON_ID) {
+			final InetSocketAddress serverInet = getConnectedServer();
+			ServerData server = null;
+			if (serverInet!=null) {
+				ServerData serverData;
+				final GuiMultiplayer mpgui = this.lastGuiMultiplayer;
+				final String serverHost = serverInet.getHostName();
+				final int serverPort = serverInet.getPort();
+				if (serverPort==25565) {
+					if (this.lastGuiMultiplayer==null||getTarget(this.lastGuiMultiplayer, serverHost)!=-1)
+						serverData = getServerData(mpgui, serverHost, serverHost, false);
+					else
+						serverData = getServerData(mpgui, serverHost+":"+serverPort, serverHost+":"+serverPort, false);
+				} else
+					serverData = getServerData(mpgui, serverHost+":"+serverPort, serverHost+":"+serverPort, false);
+				server = serverData;
+			}
+			if (server!=null)
+				if (!StringUtils.equals(this.target.getServerIP(), server.serverIP)) {
+					this.autologin.set(false);
+					this.target.set(server);
+				} else if (!this.autologin.is()) {
+					this.autologin.set(true);
+					this.target.set(server);
+				} else {
+					this.autologin.set(false);
+					this.target.set(null);
+				}
 		} else if (screen instanceof GuiDisconnected&&id==DISABLE_BACK_BUTTON_ID) {
 			final GuiDisconnected dcgui = (GuiDisconnected) screen;
 			this.autologin.set(false);
@@ -303,7 +375,7 @@ public class GuiHandler {
 			if (this.timer.getTime()>0) {
 				GuiScreen screen2 = this.compat.getParentScreen(dcgui);
 				if (!(screen2 instanceof GuiMultiplayer))
-					screen2 = new GuiMultiplayer(screen2);
+					screen2 = newGuiMultiplayer(screen2);
 				this.mc.displayGuiScreen(screen2);
 				final GuiMultiplayer mpgui = (GuiMultiplayer) screen2;
 				final ServerData serverData = this.target.get(mpgui);
@@ -313,7 +385,7 @@ public class GuiHandler {
 		} else if (screen instanceof GuiMainMenu)
 			if (this.target.getServerIP()!=null&&!this.manualOpen&&Config.getConfig().durationDisconnected.get()>=10)
 				if (this.timer.getTime()>0)
-					this.mc.displayGuiScreen(new GuiMultiplayer(screen));
+					this.mc.displayGuiScreen(newGuiMultiplayer(screen));
 	}
 
 	private void reset(final ConfigProperty<Integer> time) {
@@ -337,6 +409,8 @@ public class GuiHandler {
 
 	private int getTarget(final GuiMultiplayer mpgui, final String serverIP) {
 		final ServerList serverList = this.compat.getServerList(mpgui);
+		if (serverList==null)
+			return -2;
 		final int countserver = serverList.countServers();
 		for (int i = 0; i<countserver; i++) {
 			final ServerData serverData = serverList.getServerData(i);

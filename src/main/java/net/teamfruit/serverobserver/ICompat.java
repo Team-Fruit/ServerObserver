@@ -1,5 +1,6 @@
 package net.teamfruit.serverobserver;
 
+import java.net.SocketAddress;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -13,6 +14,7 @@ import net.minecraft.client.gui.GuiMultiplayer;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
+import net.minecraft.network.NetworkManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
@@ -56,5 +58,9 @@ public interface ICompat {
 	GuiButton createSkeletonButton(final int buttonId, final int x, final int y, final int widthIn, final int heightIn, final String buttonText, final SkeletonButtonDrawInside inside);
 
 	ThreadPoolExecutor getThreadPool();
+
+	NetworkManager getClientToServerNetworkManager();
+
+	SocketAddress getSocketAddress(NetworkManager netManager);
 
 }

@@ -1,5 +1,6 @@
 package net.teamfruit.serverobserver;
 
+import java.net.SocketAddress;
 import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -18,6 +19,7 @@ import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.gui.ServerListEntryNormal;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.multiplayer.ServerList;
+import net.minecraft.network.NetworkManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
@@ -117,6 +119,16 @@ public class Compat implements ICompat {
 	@Override
 	public GuiButton createSkeletonButton(final int buttonId, final int x, final int y, final int widthIn, final int heightIn, final String buttonText, final SkeletonButtonDrawInside inside) {
 		return new SkeletonButton(this, buttonId, x, y, widthIn, heightIn, buttonText, inside);
+	}
+
+	@Override
+	public NetworkManager getClientToServerNetworkManager() {
+		return FMLClientHandler.instance().getClientToServerNetworkManager();
+	}
+
+	@Override
+	public SocketAddress getSocketAddress(final NetworkManager netManager) {
+		return netManager.getSocketAddress();
 	}
 
 	public static class SkeletonButton extends GuiButton {
