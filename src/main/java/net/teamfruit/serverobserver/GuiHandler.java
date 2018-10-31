@@ -59,6 +59,10 @@ public class GuiHandler {
 
 	private boolean isFirstOpen = true;
 
+	private boolean isMainMenu(final GuiScreen screen) {
+		return screen instanceof GuiMainMenu||StringUtils.equals("lumien.custommainmenu.gui.GuiCustom", screen.getClass().getName());
+	}
+
 	@CoreEvent
 	public void open(final InitGuiEvent.Post e) {
 		this.manualOpen = this.manual;
@@ -111,7 +115,7 @@ public class GuiHandler {
 								dcgui.width/2-100, this.compat.getHeight(dcgui),
 								I18n.format("serverobserver.gui.backandstop", 0f)));
 			reset(Config.getConfig().durationDisconnected);
-		} else if (screen instanceof GuiMainMenu) {
+		} else if (isMainMenu(screen)) {
 			if (this.isFirstOpen)
 				if (Config.getConfig().startAndConnect.get()) {
 					final ServerData server = this.target.get(null);
@@ -119,14 +123,88 @@ public class GuiHandler {
 						this.compat.connectToServer(newGuiMultiplayer(screen), server);
 				} else if (Config.getConfig().startWithMultiplayerMenu.get())
 					this.mc.displayGuiScreen(newGuiMultiplayer(screen));
-			for (final GuiButton button : buttons)
-				if (button.id==2)
-					this.mainMenuButtonMulti = button;
+			if (screen instanceof GuiMainMenu)
+				for (final GuiButton button : buttons)
+					if (button.id==2)
+						this.mainMenuButtonMulti = button;
 			if (Config.getConfig().durationMainMenu.get()>0)
 				reset(Config.getConfig().durationMainMenu);
 		}
 		this.manual = false;
 		this.isFirstOpen = false;
+	}
+
+	private static enum TextPosition {
+		None {
+			@Override
+			public void drawText(final GuiScreen gui, final FontRenderer font, final String text, final int color, final int padding) {
+			}
+		},
+		TopLeft {
+			@Override
+			public void drawText(final GuiScreen gui, final FontRenderer font, final String text, final int color, final int padding) {
+				gui.drawString(font, text, padding, padding, color);
+			}
+		},
+		Top {
+			@Override
+			public void drawText(final GuiScreen gui, final FontRenderer font, final String text, final int color, final int padding) {
+				gui.drawString(font, text, (gui.width-font.getStringWidth(text))/2, padding, color);
+			}
+		},
+		TopRight {
+			@Override
+			public void drawText(final GuiScreen gui, final FontRenderer font, final String text, final int color, final int padding) {
+				gui.drawString(font, text, gui.width-font.getStringWidth(text)-padding, padding, color);
+			}
+		},
+		Left {
+			@Override
+			public void drawText(final GuiScreen gui, final FontRenderer font, final String text, final int color, final int padding) {
+				gui.drawString(font, text, padding, (gui.height-font.FONT_HEIGHT)/2, color);
+			}
+		},
+		Center {
+			@Override
+			public void drawText(final GuiScreen gui, final FontRenderer font, final String text, final int color, final int padding) {
+				gui.drawString(font, text, (gui.width-font.getStringWidth(text))/2, (gui.height-font.FONT_HEIGHT)/2, color);
+			}
+		},
+		Right {
+			@Override
+			public void drawText(final GuiScreen gui, final FontRenderer font, final String text, final int color, final int padding) {
+				gui.drawString(font, text, gui.width-font.getStringWidth(text)-padding, (gui.height-font.FONT_HEIGHT)/2, color);
+			}
+		},
+		BottomLeft {
+			@Override
+			public void drawText(final GuiScreen gui, final FontRenderer font, final String text, final int color, final int padding) {
+				gui.drawString(font, text, padding, gui.height-font.FONT_HEIGHT-padding, color);
+			}
+		},
+		Bottom {
+			@Override
+			public void drawText(final GuiScreen gui, final FontRenderer font, final String text, final int color, final int padding) {
+				gui.drawString(font, text, (gui.width-font.getStringWidth(text))/2, gui.height-font.FONT_HEIGHT-padding, color);
+			}
+		},
+		BottomRight {
+			@Override
+			public void drawText(final GuiScreen gui, final FontRenderer font, final String text, final int color, final int padding) {
+				gui.drawString(font, text, gui.width-font.getStringWidth(text)-padding, gui.height-font.FONT_HEIGHT-padding, color);
+			}
+		},
+		;
+
+		public abstract void drawText(GuiScreen gui, FontRenderer font, String text, int color, int padding);
+
+		public static TextPosition getPosition(final String name) {
+			try {
+				return valueOf(name);
+			} catch (final IllegalArgumentException e) {
+			}
+			return TextPosition.None;
+		}
 	}
 
 	@CoreEvent
@@ -137,11 +215,17 @@ public class GuiHandler {
 		} else if (gui instanceof GuiDisconnected) {
 			if (this.disableBackButton!=null&&Config.getConfig().durationDisconnected.get()>=10)
 				this.disableBackButton.displayString = I18n.format("serverobserver.gui.backandstop.time", I18n.format("serverobserver.gui.backandstop"), timeremain());
-		} else if (gui instanceof GuiMainMenu) {
-			final GuiButton button = this.mainMenuButtonMulti;
-			if (button!=null&&this.target.getServerIP()!=null&&!this.manualOpen)
-				button.displayString = I18n.format("serverobserver.gui.maintomulti.time", I18n.format("menu.multiplayer"), timeremain());
-		}
+		} else if (isMainMenu(gui))
+			if (this.target.getServerIP()!=null&&!this.manualOpen) {
+				final String timeDetails = I18n.format("serverobserver.gui.maintomulti.time", I18n.format("menu.multiplayer"), timeremain());
+				final GuiButton button = this.mainMenuButtonMulti;
+				if (gui instanceof GuiMainMenu&&button!=null)
+					button.displayString = timeDetails;
+				else if (gui!=null) {
+					final FontRenderer font = this.compat.font(this.mc);
+					TextPosition.getPosition(Config.getConfig().countdownPosition.get()).drawText(gui, font, timeDetails, 0xffffff, 5);
+				}
+			}
 	}
 
 	private GuiMultiplayer newGuiMultiplayer(final GuiScreen parent) {
@@ -399,7 +483,7 @@ public class GuiHandler {
 				if (serverData!=null)
 					this.compat.setPinged(serverData, false);
 			}
-		} else if (screen instanceof GuiMainMenu)
+		} else if (isMainMenu(screen))
 			if (this.target.getServerIP()!=null&&!this.manualOpen&&Config.getConfig().durationDisconnected.get()>=10)
 				if (this.timer.getTime()>0)
 					this.mc.displayGuiScreen(newGuiMultiplayer(screen));

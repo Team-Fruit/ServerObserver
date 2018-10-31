@@ -25,6 +25,7 @@ public class Config {
 	public final ConfigProperty<Boolean> startWithMultiplayerMenu;
 	public final ConfigProperty<Boolean> startAndConnect;
 	public final ConfigProperty<Boolean> ignorePopulation;
+	public final ConfigProperty<String> countdownPosition;
 
 	public final ConfigProperty<String> targetServerName;
 	public final ConfigProperty<String> targetServerIP;
@@ -54,6 +55,7 @@ public class Config {
 		this.startWithMultiplayerMenu = this.config.propertyBoolean(this.config.get("Miscellaneous", "StartWithMultiplayerMenu", false, "After game initialized, show multiplayer menu").setLanguageKey("serverobserver.config.miscellaneous.startwithmultiplayermenu").setRequiresMcRestart(true));
 		this.startAndConnect = this.config.propertyBoolean(this.config.get("Miscellaneous", "StartAndConnect", false, "After game initialized, connect to the server").setLanguageKey("serverobserver.config.miscellaneous.startandconnect").setRequiresMcRestart(true));
 		this.ignorePopulation = this.config.propertyBoolean(this.config.get("Miscellaneous", "IgnorePopulation", false, "Try connection if server is full").setLanguageKey("serverobserver.config.miscellaneous.ignorepopulation"));
+		this.countdownPosition = this.config.propertyString(this.config.get("Miscellaneous", "CountdownPosition", "TopRight", "Coutdown text position in custom main menu", new String[] { "None", "TopLeft", "Top", "TopRight", "Left", "Center", "Right", "BottomLeft", "Bottom", "BottomRight" }).setLanguageKey("serverobserver.config.miscellaneous.countdownposition"));
 
 		// init dynamic config
 		this.dynamicconfig = new ConfigBase(dynamicFile, version);
