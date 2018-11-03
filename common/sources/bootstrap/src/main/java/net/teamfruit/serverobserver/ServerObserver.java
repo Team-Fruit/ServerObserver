@@ -25,6 +25,10 @@ public class ServerObserver {
 	@SidedProxy(serverSide = Reference.PROXY_SERVER, clientSide = Reference.PROXY_CLIENT)
 	private static @Nullable CommonProxy proxy;
 
+	static {
+		UniversalVersioner.loadVersionFromFMLMod();
+	}
+
 	@NetworkCheckHandler
 	public boolean checkModList(final @Nonnull Map<String, String> versions, final @Nonnull Side side) {
 		return true;

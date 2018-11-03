@@ -189,7 +189,7 @@ dependencies {
 	shade fileTree(dir: '../libs/shade', include: '*.jar')
 
 	if (project.name==mod_commonname) {
-		compile 'net.teamfruit:fmllegacydependency:1.0.4'
+		compile 'net.teamfruit:fmllegacydependency:1.0.5'
 		if (project.isProperty('extra_fmlcore'))
 			shade 'net.teamfruit:coremodlegacydependency:1.0.0'
 	}
