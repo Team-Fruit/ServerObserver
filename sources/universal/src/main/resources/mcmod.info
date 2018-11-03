@@ -1,0 +1,25 @@
+{
+	"modListVersion": 2,
+	"modList": [
+		{
+			"modid": "serverobserver",
+			"name": "ServerObserver",
+			"description": "Observe Minecraft Server Status",
+			"mcversion": "",
+			"version": "",
+			"authorList": [
+				"Kamesuta"
+			],
+			"credits": "2017 TeamFruit",
+			"dependants": [],
+			"dependencies": ["Forge"],
+			"parent": "",
+			"requiredMods": ["Forge"],
+			"logoFile": "assets/serverobserver/textures/banner.png",
+			"screenshots": [],
+			"updateUrl": "https://github.com/Team-Fruit/ServerObserver/releases",
+			"url": "https://minecraft.curseforge.com/projects/serverobserver",
+			"useDependencyInformation": false
+		}
+	]
+}

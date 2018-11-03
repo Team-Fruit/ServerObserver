@@ -11,7 +11,7 @@ before_install:
 install: "./gradlew setupCIWorkspace --continue"
 script: "./gradlew build --continue"
 after_success:
-  - ./gradlew githubRelease curseforge --continue
+  - ./gradlew githubRelease curseforge bintrayUpload --continue
   #- ./gradlew githubRelease --continue
   #- ./gradlew bintrayUpload --continue
 before_cache:
@@ -23,7 +23,3 @@ cache:
     - $HOME/.gradle/wrapper/
 notifications:
   email: false
-  webhooks:
-    urls:
-      - secure: "SHLyTtef5pR6tD2t+RoVAeamp8bY7coFFTvITvG5kfmpjaLartudM/cwU7FtDds6BdWiUjqZl9esPshUVXJdv88+NMZoF8HZQD+Rz0M2A4pVh1eEZKzdD0d2OjbCaMzapZgRxyKtjrt5zDJo8G0H1LEMFxcoNLP3JF7nmNeUN+Dmg7QEi54dtLmDF/4rpBJUb1OJ/8E3JXI21GXIWev1e+MZW4Jy3OFYFhpDbcPMxu3JjdsCQMNLW9VQo4dQ2BHngVLMdi0AVwkw4qfd3FqLdZYlbeMnnJUns6UpfClpZZjoCM1OIAxSH4cZXzMO9eONjbtIQGVhSci4FXVodzCBV3KNCnPNIK/wI9O11Y4aFcq4j27nR7HXlxSTWaYXkIu8Ot9RyCVqOfBEFP0/BtFaE9LlTXM0bPq2KEZCMb/fhV0Vp0azeTMdeKGhgxVFclVr0YcplJ1xpYFZGleVSBhqMzVKjZ4GmCWfWCGDsz/XwvEblJfc+Nt5x1bTiuTBn6b72h28r/W55iiV0zUZdNZG1Cx1tcqkOELWJnkgnCHIPBd62NM3D8DgHVH6sgd599/Vl1udincKkSw6IEgilRdAXnu9ogJbimXHatjkjEWXnKSINGUmizqqheA3eRDYL/R7TmGGcnle3gDZ4Zbs2sIJzh5Mbkwp7dLf3hpferjOAG0="
-      - secure: "TaPOaDHt+rkHB5QBpz0ajwrMB2mmbWnofOFONITqlx+pyP1roq87gDK10+KY8/JqnB1fw+6epcRK+l1R6jzffAdBZzb1c7uaB7DLksHJc8oxFpLcDBArHUonWX82K+4NjVe80pVfwzMX6L9JEaV2xPSxTY1VHRnuc7qhVUk7yMkt9pweSwJu2vzlJLiwLabc2NIkTUQaCaWmEREt0Tb13HZWGEUidoFPKODSAQzByGlkdX6NkJhRmlpSEkhGytvV1QY2I9rO5D9Y3bnfLYRRQ57kHRjbMQe2von31UYYAfkArY4TniogTMJj/pbWsX/v0YFm2Yx/pQsgFkXYwoaDS29isYc6EqSUiQmqOI6bRuXb/5ksn38VhIj4MbVIFKGG6XkV1hzZ3nQ/AQaONmVGIy+IVwmOjZirYRsGuazEFAXp9CTGK6FACk+TCmswEMZOTnVH5w6m9OFLEokmNYCwoHudrEjgGhPT8IlV6MR+WZOYVJgBuO3zMxOe2nk/4nR4ulhtgH/JYGW5KVUK8+eVSc58tN98SgtFpWMK6MqDxrrMB6A41AzkbsMwB+cg99+0ZMTAjrW+2r2HhynnNVJbOW8cv499lV8cdkVg1V0BjZIAJxLb5RedLFSa/5cWViDNqJZuvp288OdSShf4buH0ElhGmAR3tgOoPhGQD2h8TvE="

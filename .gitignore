@@ -8,12 +8,13 @@ common/*
 
 # allow any
 !*.md
-!src/
+!LICENSE
+!sources/
 !gradle/
 !lib/
 !info/
 !build.gradle
-!common.gradle
+!build.subprojects.gradle
 !project.gradle
 !settings.gradle
 !gradle.properties
