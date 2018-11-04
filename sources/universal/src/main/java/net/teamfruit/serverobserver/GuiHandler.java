@@ -53,10 +53,6 @@ public class GuiHandler {
 		this.compat = compat;
 	}
 
-	public interface SkeletonButtonDrawInside {
-		void drawInside(GuiButton button, final Minecraft mc, final int mouseX, final int mouseY, final int x, final int y);
-	}
-
 	private boolean isFirstOpen = true;
 
 	private boolean isMainMenu(final GuiScreen screen) {

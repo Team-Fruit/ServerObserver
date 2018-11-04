@@ -26,7 +26,6 @@ import net.minecraft.util.SoundCategory;
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
-import net.teamfruit.serverobserver.GuiHandler.SkeletonButtonDrawInside;
 
 public class Compat implements ICompat {
 	public static final @Nonnull ICompat compat = new Compat();

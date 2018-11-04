@@ -24,7 +24,6 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiScreenEvent.ActionPerformedEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
-import net.teamfruit.serverobserver.GuiHandler.SkeletonButtonDrawInside;
 
 public class Compat implements ICompat {
 	public static final @Nonnull ICompat compat = new Compat();

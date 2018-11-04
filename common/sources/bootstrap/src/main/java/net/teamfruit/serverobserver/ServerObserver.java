@@ -23,7 +23,7 @@ import net.teamfruit.serverobserver.CompatProxy.CompatFMLPreInitializationEvent;
 @Mod(modid = Reference.MODID, name = Reference.NAME, version = Reference.VERSION, guiFactory = Reference.GUI_FACTORY)
 public class ServerObserver {
 	@SidedProxy(serverSide = Reference.PROXY_SERVER, clientSide = Reference.PROXY_CLIENT)
-	private static @Nullable CommonProxy proxy;
+	private static @Nullable CompatProxy proxy;
 
 	static {
 		UniversalVersioner.loadVersionFromFMLMod();
