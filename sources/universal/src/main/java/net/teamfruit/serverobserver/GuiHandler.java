@@ -55,8 +55,8 @@ public class GuiHandler {
 
 	private boolean isFirstOpen = true;
 
-	private boolean isMainMenu(final GuiScreen screen) {
-		return screen instanceof GuiMainMenu||StringUtils.equals("lumien.custommainmenu.gui.GuiCustom", screen.getClass().getName());
+	private boolean isMainMenu(final @Nullable GuiScreen screen) {
+		return screen instanceof GuiMainMenu||screen!=null&&StringUtils.equals("lumien.custommainmenu.gui.GuiCustom", screen.getClass().getName());
 	}
 
 	@CoreEvent
